@@ -1,7 +1,6 @@
 # brewix-installer
 
-<b>to do list:</b>
-
+<b>to do list:</b><br>
     help menu: will update
     select language: done
     select time: done
