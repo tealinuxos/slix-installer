@@ -21,3 +21,5 @@ task :
 - show time zone city: done
 - clear command: done
 - help command: done
+
+all u had to do just test the script cj
