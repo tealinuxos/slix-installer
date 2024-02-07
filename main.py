@@ -80,11 +80,19 @@ def set_device(selected_device, device_names):
     else:
         print("Invalid device name. Please select a valid device.")
 
+def set_device_efi(selected_device_efi, device_names):
+    if selected_device_efi in device_names:
+        print(f"[*] Selected device set to: {selected_device_efi}")
+        return selected_device_efi
+    else:
+        print("Invalid device name. Please select a valid device.")
+
 ### 0.4 set time zone ###
 def set_time(region, city):
     subprocess.run(["ln", "-sf", f"/usr/share/zoneinfo/{region}/{city}", "/etc/localtime"]) ## on development i command this line bcz i dont want make my machine get execute this command LOL
     subprocess.run(["hwclock", "--systohc"])
     print(f"[*] Timezone set to {region}/{city}")
+    return  region, city
 
 ### 0.5 show all time zone ###
 def list_time_zones():
@@ -138,6 +146,7 @@ def set_language(locale):
         subprocess.run(["sed", "-i", f"s/^#\\s*{locale}/{locale}/", "/etc/locale.gen"])
         # Generate the locale
         subprocess.run(["locale-gen"])
+        subprocess.run(["echo", f"LANG={locale}", ">", "/etc/locale.conf"])
         print(f"[*] Language set to {locale}")
 
     except subprocess.CalledProcessError as e:
@@ -148,12 +157,95 @@ def set_language(locale):
 # make btrfs the device that user input, and then mount it
 # make sure user input package and if not it will be determinate
 # and make all logic that will be execute in arch installation
-def install_arch(selected_device):
-    if selected_device:
-        print(f"Installing Arch Linux with Btrfs on /dev/{selected_device}...")
-        # (Your installation code here)
+def install_arch(selected_device,selected_device_efi,selected_time_region,selected_time_city,selected_lang, selected_keymap,selected_hostname, selected_root_pass):
+    if selected_device and selected_device_efi:
+        print(f"{co.g}Installing Arch Linux with Btrfs on /dev/{selected_device}...{co.re}")
+        # Format and mount the selected device
+        subprocess.run(["mkfs.btrfs", f"/dev/{selected_device}"])
+        subprocess.run(["mount", f"/dev/{selected_device}", "/mnt"])
+
+        # Create subvolumes for root and home
+        subprocess.run(["btrfs", "su", "cr", "/mnt/@"])
+        subprocess.run(["btrfs", "su", "cr", "/mnt/@home"])
+        subprocess.run(["btrfs", "su", "cr", "/mnt/@root"])
+        subprocess.run(["btrfs", "su", "cr", "/mnt/@srv"])
+        subprocess.run(["btrfs", "su", "cr", "/mnt/@log"])
+        subprocess.run(["btrfs", "su", "cr", "/mnt/@cache"])
+        subprocess.run(["btrfs", "su", "cr", "/mnt/@tmp"])
+        subprocess.run(["btrfs", "su", "li", "/mnt"])
+        
+        # umounting
+        subprocess.run(["cd", "/"])
+        subprocess.run(["umount", "/mnt"])
+        
+        # mounting subvolume
+        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@", f"/dev/{selected_device}", "/mnt"])
+
+        # make dir
+        os.system("mkdir -p /mnt/home")
+        os.system("mkdir -p /mnt/root")
+        os.system("mkdir -p /mnt/srv")
+        os.system("mkdir -p /mnt/tmp")
+        os.system("mkdir -p /mnt/var/log")
+        os.system("mkdir -p /mnt/var/cache")
+
+        # mounting all subvolume
+        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@home", f"/dev/{selected_device}", "/mnt/home"])
+        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@root", f"/dev/{selected_device}", "/mnt/root"]) 
+        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@srv", f"/dev/{selected_device}", "/mnt/srv"])
+        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@log", f"/dev/{selected_device}", "/mnt/var/log"])
+        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@cache", f"/dev/{selected_device}", "/mnt/var/cache"])
+        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@tmp", f"/dev/{selected_device}", "/mnt/tmp"])
+
+        # make dir boot
+        os.system("mkdir -p /mnt/boot/efi")
+        subprocess.run(["mount", f"/dev/{selected_device_efi}", "mnt/boot/efi"])
+
+        # Install Arch Linux base system
+        subprocess.run(["pacstrap", "/mnt", "base", "base-devel", "linux", "linux-firmware", "btrfs-progs", "grub"])
+        
+        # genfstab
+        subprocess.run(["genfstab", "-U", "/mnt", ">>", "/mnt/etc/fstab"])
+        
+        # arch chroot !!
+        subprocess.run(["arch-chroot", "/mnt"])
+        
+        # setting time
+        set_time(selected_time_region, selected_time_city)
+        # setting language
+        set_language(selected_lang)
+        # setting keymaps
+        set_keymap(selected_keymap)
+        # setting hostname
+        set_hostname(selected_hostname)
+        # setting hosts
+        write_to_hosts_file()
+        # install network manager
+        os.system("pacman -S --noconfirm networkmanager grub efibootmgr && systemctl enable NetworkManager")
+        # change root pass
+        if selected_root_pass:
+            set_root_pass(selected_root_pass)
+        else:
+            pass
+        # install grub
+        
+        
+
     else:
         print("Please set a device using 'set /dev/(device_name)' before installing.")
+
+def write_to_hosts_file():
+    lines = [
+        "# Static table lookup for hostnames.",
+        "# See hosts(5) for details.",
+        "127.0.0.1                 localhost",
+        "::1                       localhost",
+        "127.0.0.1                 tealinux.localdomain"
+    ]
+
+    with open("/etc/hosts", "a") as file:
+        for line in lines:
+            file.write(line + "\n")
 
 ### install aditional package ###
 def install_packages(package_list):
@@ -195,6 +287,31 @@ def print_keymaps(keymap_list):
                 if index < len(lines):
                     print(f"[*] {lines[index]:<{column_width}}", end="\t")
             print()  # Move to the next line after printing each row
+      
+            
+def set_keymap(keymap):
+    keymap_list = list_keymaps()
+    if keymap in keymap_list:
+        try:
+            subprocess.run(["echo", f"KEYMAP={keymap}", ">", "/etc/vconsole.conf"])
+            print(f"[*] Keymap set to {keymap}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error: {e}")
+    else:
+        print("[!] Invalid keymap code. Please select a valid keymap.")
+
+def set_hostname(hostname):
+        try:
+            subprocess.run(["echo", f"{hostname}", ">", "/etc/hostname"])
+            print(f"[*] Hostname was set to {hostname}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error: {e}")
+
+### set root pass ###
+def set_root_pass(pass_root):
+    subprocess.run(['passwd'], input=pass_root.encode(), text=True)
+    print("[*]  Root password has been set.\n")
+    
 
 ### 0.9 show help ###
 def help():
@@ -206,12 +323,16 @@ def help():
     options:
     help\t\t\tShow all command
     partition\t\t\tShow all partition on your device
-    set (device name)\t\tSetting your device partition to be place for install Tea Linux
-    set user\t\t\tMake default user after installation
+    set efi /dev/(device name)\tSetting your device partition to be place for install bootloader
+    set /dev/(device name)\tSetting your device partition to be place for install Tea Linux
+    set user (username)\t\tMake default user after installation
+    set hostname (hostname)\tSetting hostname of your machine
+    set root pass\tSetting your root password (opsionale)
     set package (package)\tList package that you want install
     set DE\t\t\tSetting your desktop environment
     set time (region) (city)\tSetting localtime
-    set language (LocaleCode)\tSetting your /etc/locale.gen
+    set language (LocaleCode)\tSetting your langueage machine
+    set keymaps (keymapcode)\tSetting your your keymaps machine
     list time zone\t\tShow all time zone
     list city (region)\t\tShow all city in the region
     list keymaps\t\tShow all keyboard layout
@@ -222,6 +343,13 @@ def help():
 ### 1. main function i think, bcz this the prompt###
 def teaprompt():
     selected_device = None
+    selected_device_efi = None
+    selected_time_region = None
+    selected_time_city = None
+    selected_lang = None
+    selected_keymap = None
+    selected_hostname = None
+    selected_root_pass = None
     os.system("clear")
     ban()
     print(f"{co.ye}Welcome to TeaLinux Installer. Type 'help' to see all command and type 'exit' to quit.{co.re}\n")
@@ -242,12 +370,24 @@ def teaprompt():
         # if user type set /dev/(device name)
         elif user_input.lower().startswith('set /dev/'):
             selected_device = set_device(user_input[9:], device_names)
+        elif user_input.lower().startswith('set efi /dev/'):
+            selected_device = set_device_efi(user_input[9:], device_names)
         # if user type install
         elif user_input.lower() == 'install':
-            install_arch(selected_device, package_list)
+            if selected_device and selected_device_efi and selected_time_city and selected_time_region and selected_lang and selected_keymap and selected_hostname:
+                install_arch(selected_device, package_list, selected_device_efi, selected_time_city, selected_time_region, selected_lang, selected_keymap,selected_hostname, selected_root_pass)
+            else:
+                print(f"{co.r}[!] select partition first !{co.re}")
         # if user type list time zone
         elif user_input.lower() == 'list time zone':
             list_time_zones()
+        # set root pass
+        elif user_input.lower() == 'set root pass':
+            selected_root_pass = input("Tea Installer[root pass] > ")
+            if selected_root_pass:
+                print(f"{co.g}[*] Your root password has set{co.re}")
+            else:
+                print(f"{co.r}[!] YOu didn't input anything{co.re}")
         # if user type clear
         elif user_input.lower() == 'clear':
             os.system("clear")
@@ -256,22 +396,38 @@ def teaprompt():
         elif user_input.lower() == 'list keymaps':
             keymap_list = list_keymaps()
             print_keymaps(keymap_list)
-        # if user input package that will be installed
+            
+        elif user_input.lower().startswith('set keymaps'):
+            tokens = user_input.split(' ', 3)
+            if len(tokens) == 3:
+                _, _, keymap = tokens
+                selected_keymap = keymap
+                keymap_list = list_keymaps()
+                if keymap in keymap_list:
+                    print(f"{co.g}[*] Keymap set to {selected_keymap}{co.re}")
+                else:
+                    print("[!] Invalid keymap code. Please select a valid keymap.")
+            else:
+                print("[!] Invalid 'set keymap' command format. Please use 'set keymap keymap_code'.")
+            
+            # if user input package that will be installed
         elif user_input.lower().startswith('set package'):
             tokens = user_input.split(' ', 2)
             if len(tokens) == 3:
                 _, _, packages = tokens
                 package_list = packages.split()
+                print(f"[*] Package that will be install : {', '.join(package_list)}")
             else:
                 print("[!] Invalid 'set package' command format. Please use 'set package Package1 Package2 ...'.")
-        # ... (Command lainnya)
 
         # if user type set time Region City
         elif user_input.lower().startswith('set time'):
             tokens = user_input.split(' ', 3)
             if len(tokens) == 4:
                 _, _, region, city = tokens
-                set_time(region, city)
+                selected_time_region = region
+                selected_time_city = city
+                print(f"{co.g}[*] Time set to {region}/{city} ..{co.re}")
             else:
                 print("[!] Invalid 'set time' command format. Please use 'set time Region City'.")
                 
@@ -282,7 +438,7 @@ def teaprompt():
                 list_languages()
             elif len(tokens) == 3:
                 _, _, locale = tokens
-                set_language(locale)
+                selected_lang = locale
             else:
                 print(f"[!] Invalid {co.r}'set language'{co.re} command format. Please use {co.ye}'set language'{co.re} to list or {co.g}'set language LocaleCode'{co.re} to set.")
                 
@@ -294,8 +450,18 @@ def teaprompt():
                 list_time_city(cityin)
             else:
                 print(f"[!]  Invalid {co.r}'list city'{co.re} command format. Please use {co.g}'list city Regions'{co.re}.")
+                
+        elif user_input.lower().startswith('set hostname'):
+            tokens = user_input.split(' ', 3)
+            if len(tokens) == 3:
+                _, _, hostname = tokens
+                selected_hostname = hostname
+                print(f"{co.g}[*] Hostname set to {selected_hostname}{co.re}")
+            else:
+                print("[!] Invalid 'set hostname' command format. Please use 'set hostname YourHostName'.")
+    
         else:
             print("[!] Command not found ..")
-
+    
 if __name__ == "__main__":
     teaprompt()
