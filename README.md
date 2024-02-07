@@ -25,3 +25,5 @@ all u had to do just test the script cj
 
 last update
 8 feb 2024 01:23 am WIB
+
+last progress line 231
