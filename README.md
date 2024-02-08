@@ -1,5 +1,5 @@
 # brewix-installer
-
+# masih error hehee bagian function install
 task :
 
 - help menu: will update
