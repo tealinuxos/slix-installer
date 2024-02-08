@@ -26,4 +26,4 @@ all u had to do just test the script cj
 last update
 8 feb 2024 09:30 am WIB
 
-last progress line 231
+last progress on function choose DE
