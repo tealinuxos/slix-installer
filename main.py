@@ -78,14 +78,15 @@ def set_device(selected_device, device_names):
         print(f"[*] Selected device set to: {selected_device}")
         return selected_device
     else:
-        print("Invalid device name. Please select a valid device.")
+        print(f"{co.r}[!] Invalid device name. Please select a valid device.{co.re}")
 
 def set_device_efi(selected_device_efi, device_names):
+    selected_device_efi = selected_device_efi.split('/')[-1]  # Extract the device name
     if selected_device_efi in device_names:
-        print(f"[*] Selected device set to: {selected_device_efi}")
+        print(f"[*] Selected EFI device set to: {selected_device_efi}")
         return selected_device_efi
     else:
-        print("Invalid device name. Please select a valid device.")
+        print(f"{co.r}[!] Invalid EFI device name. Please select a valid device.{co.re}")
 
 ### 0.4 set time zone ###
 def set_time(region, city):
@@ -157,7 +158,7 @@ def set_language(locale):
 # make btrfs the device that user input, and then mount it
 # make sure user input package and if not it will be determinate
 # and make all logic that will be execute in arch installation
-def install_arch(selected_device,selected_device_efi,selected_time_region,selected_time_city,selected_lang, selected_keymap,selected_hostname, selected_username, selected_user_pass, selected_root_pass):
+def install_arch(selected_device,selected_device_efi,selected_time_region,selected_time_city,selected_lang, selected_keymap,selected_hostname, selected_username, selected_user_pass, selected_root_pass,selected_DE):
     if selected_device and selected_device_efi:
         print(f"{co.g}Installing Arch Linux with Btrfs on /dev/{selected_device}...{co.re}")
         # Format and mount the selected device
@@ -245,6 +246,7 @@ def install_arch(selected_device,selected_device_efi,selected_time_region,select
         # update sudoers
         update_sudoers()
         # install DE
+        install_desktop_environment(selected_DE)
 
     else:
         print("Please set a device using 'set /dev/(device_name)' before installing.")
@@ -341,15 +343,11 @@ def set_user_pass(username, user_pass):
 
 def install_desktop_environment(desktop_env):
     if desktop_env.lower() == "gnome":
-        subprocess.run(["pacman", "-S", "--noconfirm", "gnome", "gnome-tweaks", "gdm", "xorg-server", "xorg-apps", "xorg-xinit", "xterm", "&&", "systemctl", "start", "gdm.service", "&&", "systemctl", "enable", "gdm.service"], check=True)
+        subprocess.run(["pacman", "-S", "--noconfirm", "gnome", "gnome-tweaks", "gdm", "xorg-server", "xorg-apps", "xorg-xinit", "xterm", "&&", "systemctl", "start", "gdm.service", "&&", "systemctl", "enable", "gdm.service", "-f"], check=True)
     elif desktop_env.lower() == "xfce":
-        subprocess.run(["pacman", "-S", "xfce4", "ssdm", "xfce4-goodies"], check=True)
+        subprocess.run(["pacman", "-S", "xfce4", "sddm", "xfce4-goodies", "xorg-server", "xorg-apps", "xorg-xinit", "xterm", "&&", "systemctl", "start", "sddm.service", "&&", "systemctl", "enable", "sddm.service", "-f"], check=True)
     elif desktop_env.lower() == "kde":
-        subprocess.run(["pacman", "-S", "plasma-desktop"], check=True)
-    elif desktop_env.lower() == "lxde":
-        subprocess.run(["pacman", "-S", "lxde"], check=True)
-    elif desktop_env.lower() == "lxqt":
-        subprocess.run(["pacman", "-S", "lxqt"], check=True)
+        subprocess.run(["pacman", "-S", "--no-confirm", "plasma", "kdm", "konsole", "dolphin", "ark", "kwrite kcalc", "spectacle", "krunner", "partitionmanager", "packagekit-qt5", "xorg-server", "xorg-apps", "xorg-xinit", "xterm",  "&&", "systemctl", "start", "kdm.service", "&&", "systemctl", "enable", "kdm.service", "-f"], check=True)
     else:
         print(f"Desktop environment '{desktop_env}' is not supported.")
 
@@ -405,6 +403,7 @@ def help():
     list time zone\t\tShow all time zone
     list city (region)\t\tShow all city in the region
     list keymaps\t\tShow all keyboard layout
+    show options\t\tShow all options that you select
     clear\t\t\tclear prompt
     exit\t\t\tExit installer   
     """)
@@ -421,6 +420,8 @@ def teaprompt():
     selected_root_pass = None
     selected_username = None
     selected_user_pass = None
+    package_list = None
+    selected_DE = None
     os.system("clear")
     ban()
     print(f"{co.ye}Welcome to TeaLinux Installer. Type 'help' to see all command and type 'exit' to quit.{co.re}\n")
@@ -441,12 +442,15 @@ def teaprompt():
         # if user type set /dev/(device name)
         elif user_input.lower().startswith('set /dev/'):
             selected_device = set_device(user_input[9:], device_names)
+        
         elif user_input.lower().startswith('set efi /dev/'):
-            selected_device = set_device_efi(user_input[9:], device_names)
+            selected_device_efi = set_device_efi(user_input[8:], device_names) 
+
+
         # if user type install
         elif user_input.lower() == 'install':
             if selected_device and selected_device_efi and selected_time_city and selected_time_region and selected_lang and selected_keymap and selected_hostname and selected_username and selected_user_pass and package_list:
-                install_arch(selected_device, package_list, selected_device_efi, selected_time_city, selected_time_region, selected_lang, selected_keymap,selected_hostname, selected_root_pass,selected_user_pass,selected_username,package_list)
+                install_arch(selected_device, package_list, selected_device_efi, selected_time_city, selected_time_region, selected_lang, selected_keymap,selected_hostname, selected_root_pass,selected_user_pass,selected_username,package_list, selected_DE)
             else:
                 print(f"{co.r}[!] select partition first !{co.re}")
         # if user type list time zone
@@ -466,7 +470,7 @@ def teaprompt():
                 print(f"{co.g}[*] Your username is {selected_username}{co.re}")
             else:
                 print(f"{co.r}[!] You didn't input anything{co.re}")
-            selected_user_pass= input("Tea Installer[username] > ")
+            selected_user_pass= input("Tea Installer[password] > ")
             if selected_user_pass:
                 print(f"{co.g}[*] Your password for user {selected_username} is set ..{co.re}")
             else:
@@ -480,7 +484,24 @@ def teaprompt():
         elif user_input.lower() == 'list keymaps':
             keymap_list = list_keymaps()
             print_keymaps(keymap_list)
+        
+        elif user_input.lower().startswith("set de"):
+            tokens = user_input.split(' ', 2)
+            support = ["gnome", "xfce", "kde"]
+            if len(tokens) == 3:
+                _, _, de = tokens
+                if  de in support:
+                    selected_DE = de
+                    print(f"{co.g}[*]  Set your Desktop Enviroment to {selected_DE}{co.re}")
+                else:
+                    print(f"{co.r}[!] you set to {de}, that Desktop Enviroment is not support for now{co.re}")
+            else:
+                print(f"{co.g}[*] List Desktop Enviroment that we supported to install (for now): {co.re}")
+                for i in support:
+                    print(f"[*] {i}")
+                print(f"[!]  Invalid {co.r}'set de'{co.re} command format. Please use {co.g}'set de DesktopEnviroment'{co.re}.")
             
+        
         elif user_input.lower().startswith('set keymaps'):
             tokens = user_input.split(' ', 3)
             if len(tokens) == 3:
@@ -523,6 +544,7 @@ def teaprompt():
             elif len(tokens) == 3:
                 _, _, locale = tokens
                 selected_lang = locale
+                print(f"{co.g}[*] Language set to {selected_lang} ..{co.re}")
             else:
                 print(f"[!] Invalid {co.r}'set language'{co.re} command format. Please use {co.ye}'set language'{co.re} to list or {co.g}'set language LocaleCode'{co.re} to set.")
                 
@@ -543,7 +565,21 @@ def teaprompt():
                 print(f"{co.g}[*] Hostname set to {selected_hostname}{co.re}")
             else:
                 print("[!] Invalid 'set hostname' command format. Please use 'set hostname YourHostName'.")
-    
+        
+        elif user_input.lower().startswith('show options'):
+            print(f"{co.g}[*] partition for Tea install:\t{selected_device}")
+            print(f"[*] partition for EFI:\t\t{selected_device_efi}")
+            print(f"[*] region time:\t\t{selected_time_region}")
+            print(f"[*] city time:\t\t\t{selected_time_city}")
+            print(f"[*] language:\t\t\t{selected_lang}")
+            print(f"[*] keymaps:\t\t\t{selected_keymap}")
+            print(f"[*] root password:\t\t{selected_root_pass}")
+            print(f"[*] username:\t\t\t{selected_username}")
+            print(f"[*] password for {selected_username}:\t\t{selected_user_pass}")
+            print(f"[*] hostname:\t\t\t{selected_hostname}")
+            print(f"[*] aditional packages:\t\t{package_list}")
+            print(f"[*] Desktop Enviroment:\t\t{selected_DE}")
+            print(f"{co.re}{co.ye}[*] All settings are saved in the config file.{co.re}")
         else:
             print("[!] Command not found ..")
     
