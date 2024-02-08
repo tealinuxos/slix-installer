@@ -6,10 +6,10 @@ task :
 - select language: done
 - select time: done
 - select keyboard layout: done
-- setup user: on going
-- setup desktop environment: on going (gnome, xfce. kde, if u can try add hyprland too)
-- setup bootloader: on going (for now using grub only)
-- setup root password: on going
+- setup user: done
+- setup desktop environment: ON PROGRESS
+- setup bootloader: done (for now using grub only)
+- setup root password: done
 - setup audio: on going
 - setup package: maybe done
 - network configuration: i think done
@@ -24,6 +24,6 @@ task :
 all u had to do just test the script cj
 
 last update
-8 feb 2024 01:23 am WIB
+8 feb 2024 09:30 am WIB
 
 last progress line 231
