@@ -7,7 +7,7 @@ task :
 - select time: done
 - select keyboard layout: done
 - setup user: done
-- setup desktop environment: ON PROGRESS
+- setup desktop environment: done
 - setup bootloader: done (for now using grub only)
 - setup root password: done
 - setup audio: on going
