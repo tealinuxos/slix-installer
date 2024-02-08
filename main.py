@@ -402,26 +402,27 @@ def update_sudoers():
         print("[!] Error: sudoers file not found.")
         return
 
-    # Pola regex untuk mencari baris yang cocok
+    # regex pattern to search uncommend wheel
     pattern = r"^# (%wheel\s+ALL=\(ALL:ALL\) ALL)$"
     new_line = "%wheel ALL=(ALL:ALL) ALL"
 
     updated_content = []
     for line in sudoers_content:
         if re.match(pattern, line.strip()):
-            updated_content.append(new_line)  # Mengubah baris yang cocok
+            updated_content.append(new_line)  # change the correct line
         else:
             updated_content.append(line)
 
-    # Menulis kembali isi file sudoers
+    # rewrite sudoers
     try:
-        result = subprocess.run(["arch-chroot", "/mnt", f"echo -e {'\n'.join(updated_content)} | tee /etc/sudoers"], capture_output=True, text=True)
+        result = subprocess.run(["arch-chroot", "/mnt", "sh", "-c", "echo -e '{}' | sudo tee /etc/sudoers".format('\n'.join(updated_content))], capture_output=True, text=True)
         if result.returncode == 0:
-            print(f"{co.g}[*] sudoers file has been updated.{co.re}")
+            print("[*] sudoers file has been updated.")
         else:
-            print(f"{co.r}[!] Error updating sudoers file: {result.stderr}{co.re}")
+            print("[!] Error updating sudoers file:", result.stderr)
     except PermissionError:
-        print(f"{co.r}[!] Error: Permission denied. Make sure you have the necessary permissions to modify the sudoers file.{co.re}")
+        print("[!] Error: Permission denied. Make sure you have the necessary permissions to modify the sudoers file.")
+
 
         
 
