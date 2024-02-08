@@ -90,8 +90,8 @@ def set_device_efi(selected_device_efi, device_names):
 
 ### 0.4 set time zone ###
 def set_time(region, city):
-    subprocess.run(["ln", "-sf", f"/usr/share/zoneinfo/{region}/{city}", "/etc/localtime"]) ## on development i command this line bcz i dont want make my machine get execute this command LOL
-    subprocess.run(["hwclock", "--systohc"])
+    subprocess.run([f"arch-chroot /mnt ln -sf /usr/share/zoneinfo/{region}/{city} /etc/localtime"], shell=True) ## on development i command this line bcz i dont want make my machine get execute this command LOL
+    subprocess.run([f"arch-chroot /mnt hwclock --systohc"], shell=True)
     print(f"[*] Timezone set to {region}/{city}")
     return  region, city
 
@@ -144,10 +144,10 @@ def list_languages():
 def set_language(locale):
     try:
         # Uncomment the selected language in /etc/locale.gen
-        subprocess.run(["sed", "-i", f"s/^#\\s*{locale}/{locale}/", "/etc/locale.gen"])
+        subprocess.run([f"arch-chroot /mnt sed -i s/^#\\s*{locale}/{locale}/ /etc/locale.gen"], shell=True)
         # Generate the locale
-        subprocess.run(["locale-gen"])
-        subprocess.run(["echo", f"LANG={locale}", ">", "/etc/locale.conf"])
+        subprocess.run([f"arch-chroot /mnt locale-gen"], shell=True)
+        subprocess.run([f"arch-chroot /mnt echo LANG={locale} > /etc/locale.conf"], shell=True)
         print(f"[*] Language set to {locale}")
 
     except subprocess.CalledProcessError as e:
@@ -158,7 +158,7 @@ def set_language(locale):
 # make btrfs the device that user input, and then mount it
 # make sure user input package and if not it will be determinate
 # and make all logic that will be execute in arch installation
-def install_arch(selected_device, selected_device_efi, selected_time_region, selected_time_city, selected_lang, selected_keymap, selected_hostname, selected_username, selected_user_pass, selected_root_pass, selected_DE):
+def install_arch(selected_device, selected_device_efi, selected_time_region, selected_time_city, selected_lang, selected_keymap, selected_hostname, selected_username, selected_user_pass, selected_root_pass, selected_DE, package_list):
     if selected_device and selected_device_efi:
         print(f"{co.g}Installing Tea Linux with Btrfs on /dev/{selected_device}...{co.re}")
         
@@ -210,6 +210,9 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
         subprocess.run("genfstab -U /mnt >> /mnt/etc/fstab", shell=True) ## i think something wrong in here
         check_fstab()
         
+        # install adational package
+        install_packages(package_list)
+        
         # Arch chroot
         subprocess.run("arch-chroot /mnt", shell=True)
         
@@ -221,20 +224,22 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
         write_to_hosts_file()
         
         # Install network manager
-        os.system("pacman -S --noconfirm networkmanager grub efibootmgr && systemctl enable NetworkManager")
+        os.system("arch-chroot /mnt pacman -S --noconfirm networkmanager grub efibootmgr && systemctl enable NetworkManager")
         
         # Change root password
         if selected_root_pass:
             set_root_pass(selected_root_pass)
+        else:
+            print(f"{co.ye}[!] You not setting root pass ..{co.re}")
         # Install Grub
-        install_grub = subprocess.run("grub-install --target=x86_64-efi --efi-directory=/boot/efi", shell=True, capture_output=True, text=True)
+        install_grub = subprocess.run("arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi", shell=True, capture_output=True, text=True)
         if install_grub.returncode == 0 and "Installation finished. No error reported." in install_grub.stdout:
             print(f"{co.g}[*] Install Grub Finished{co.re}")
         else:
             print(f"{co.r}[-] Grub installation failed. Please check for errors.{co.re}")
             print(f"{co.r}[!] error: {install_grub.stderr}{co.re}")
         # Generate Grub config
-        mkgrub = subprocess.run("grub-mkconfig -O /boot/grub/grub.cfg", shell=True, capture_output=True, text=True)
+        mkgrub = subprocess.run("arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg", shell=True, capture_output=True, text=True)
         if mkgrub.returncode == 0 and "Found linux image:" in mkgrub.stdout and "Found initrd image:" in mkgrub.stdout and "Found fallback initrd image(s) in /boot:" in mkgrub.stdout:
             print(f"{co.g}[*] Grub config was created successfully.{co.re}")
         else:
@@ -247,6 +252,19 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
         
         # Install desktop environment
         install_desktop_environment(selected_DE)
+        
+        # finish
+        print(f"{co.g}[+] Tea Linux was installed ..{co.re}")
+        ask = input("Do you want to reboot? [y/N]: ")
+        if ask.startswith("y" or "Y"):
+            subprocess.run(["umount -R /mnt"], shell=True)
+            print(f"{co.g}[+] umounting /mnt successfully ..{co.re}")
+            print(f"{co.g}[+] rebooting system in 5 second ..{co.re}")
+            os.system("sleep 5 && reboot")
+        else:
+            print(f"{co.g}[*] Back to chroot ..{co.re}")
+            os.system("arch-chroot /mnt")
+        
     else:
         print(f"{co.g}[!] Please set a device using 'set /dev/(device_name)' before installing.{co.re}")
 
@@ -275,9 +293,17 @@ def write_to_hosts_file():
         "127.0.0.1                 tealinux.localdomain"
     ]
 
-    with open("/etc/hosts", "a") as file:
-        for line in lines:
-            file.write(line + "\n")
+    # Menyiapkan konten yang akan ditambahkan ke file /etc/hosts
+    hosts_content = '\n'.join(lines)
+
+    # Menjalankan perintah echo dengan menggunakan subprocess.run untuk menambahkan konten ke file /etc/hosts
+    result = subprocess.run([f"arch-chroot /mmt echo {hosts_content} | sudo tee -a /etc/hosts"], shell=True, text=True)
+
+    # Memeriksa apakah perintah berhasil dijalankan
+    if result.returncode == 0:
+        print(f"{co.g}[*] Content has been added to /etc/hosts.{co.re}")
+    else:
+        print(f"{co.r}[!] Error adding content to /etc/hosts: {result.stderr}{co.re}")
 
 ### install aditional package ###
 def install_packages(package_list):
@@ -325,7 +351,7 @@ def set_keymap(keymap):
     keymap_list = list_keymaps()
     if keymap in keymap_list:
         try:
-            subprocess.run(["echo", f"KEYMAP={keymap}", ">", "/etc/vconsole.conf"])
+            subprocess.run([f"arch-chroot /mnt echo KEYMAP={keymap} > /etc/vconsole.conf"], shell=True)
             print(f"[*] Keymap set to {keymap}")
         except subprocess.CalledProcessError as e:
             print(f"Error: {e}")
@@ -334,65 +360,69 @@ def set_keymap(keymap):
 
 def set_hostname(hostname):
         try:
-            subprocess.run(["echo", f"{hostname}", ">", "/etc/hostname"])
+            subprocess.run([f"arch-chroot /mnt echo {hostname} > /etc/hostname"],shell=True)
             print(f"[*] Hostname was set to {hostname}")
         except subprocess.CalledProcessError as e:
             print(f"Error: {e}")
 
 ### set root pass ###
 def set_root_pass(pass_root):
-    result = subprocess.run(['passwd'], input=pass_root.encode(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, text=True)
+    passwd_input = f"{pass_root}\n{pass_root}\n"
+    result = subprocess.run(['arch-chroot', '/mnt', 'passwd'], input=passwd_input.encode(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if result.returncode == 0:
-        print("[*] Root password has been set.")
+        print(f"{co.g}[*] Root password has been set.{co.re}")
     else:
-        print("[!] Error setting root password:", result.stderr)
+        print(f"{co.g}[!] Error setting root password: {result.stderr}{co.re}")
     
 ### set username & pass ###
 def set_user_pass(username, user_pass):
     try:
-        subprocess.run(["useradd", "-m", "-g", "users", "-G", "audio,video,network,wheel,storage,rfkill", "-s", "/bin/bash", username], check=True)
-        subprocess.run(["passwd", username], input=user_pass.encode(), check=True)
+        subprocess.run([f"arch-chroot useradd -m -g users -G audio,video,network,wheel,storage,rfkill -s /bin/bash {username}"], shell=True, check=True)
+        subprocess.run([f"arch-chroot passwd {username}"], shell=True, input=user_pass.encode(), check=True)
         print(f"[*] User '{username}' has been created with the provided password.")
     except subprocess.CalledProcessError as e:
         print(f"[!] Error creating user '{username}': {e}")
 
 def install_desktop_environment(desktop_env):
     if desktop_env.lower() == "gnome":
-        subprocess.run(["pacman", "-S", "--noconfirm", "gnome", "gnome-tweaks", "gdm", "xorg-server", "xorg-apps", "xorg-xinit", "xterm", "pipewire", "pipewire-pulse", "&&", "systemctl", "start", "gdm.service", "&&", "systemctl", "enable", "gdm.service", "-f", "&&" "systemctl", "--user", "--now", "enable", "pipewire", "pipewire-pulse"], check=True)
+        subprocess.run(["arch-chroot /mnt pacman -S --noconfirm gnome gnome-tweaks gdm xorg-server xorg-apps xorg-xinit xterm pipewire pipewire-pulse && systemctl start gdm.service && systemctl enable gdm.service -f && systemctl --user --now enable pipewire pipewire-pulse"], shell=True, check=True)
     elif desktop_env.lower() == "xfce":
-        subprocess.run(["pacman", "-S", "xfce4", "sddm", "xfce4-goodies", "xorg-server", "xorg-apps", "xorg-xinit", "xterm", "pipewire", "pipewire-pulse", "&&", "systemctl", "start", "sddm.service", "&&", "systemctl", "enable", "sddm.service", "-f", "&&" "systemctl", "--user", "--now", "enable", "pipewire", "pipewire-pulse"], check=True)
+        subprocess.run(["arch-chroot /mnt pacman -S --noconfirm xfce4 sddm xfce4-goodies xorg-server xorg-apps xorg-xinit xterm pipewire pipewire-pulse && systemctl start sddm.service && systemctl enable sddm.service -f && systemctl --user --now enable pipewire pipewire-pulse"], shell=True, check=True)
     elif desktop_env.lower() == "kde":
-        subprocess.run(["pacman", "-S", "--no-confirm", "plasma", "kdm", "konsole", "dolphin", "ark", "kwrite kcalc", "spectacle", "krunner", "partitionmanager", "packagekit-qt5", "xorg-server", "xorg-apps", "xorg-xinit", "xterm", "pipewire", "pipewire-pulse", "&&", "systemctl", "start", "kdm.service", "&&", "systemctl", "enable", "kdm.service", "-f", "&&" "systemctl", "--user", "--now", "enable", "pipewire", "pipewire-pulse"], check=True)
+        subprocess.run(["arch-chroot /mnt pacman -S --no-confirm plasma kdm konsole dolphin ark kwrite kcalc spectacle krunner partitionmanager packagekit-qt5 xorg-server xorg-apps xorg-xinit xterm pipewire pipewire-pulse && systemctl start kdm.service && systemctl enable kdm.service -f && systemctl --user --now enable pipewire pipewire-pulse"], check=True)
     else:
-        print(f"Desktop environment '{desktop_env}' is not supported.")
+        print(f"Desktop environment '{desktop_env}' is not supported for now.")
 
 def update_sudoers():
     # read sudoers
     try:
-        with open("/etc/sudoers", "r") as file:
-            sudoers_content = file.readlines()
+        result = subprocess.run(['arch-chroot /mnt cat /etc/sudoers'], shell=True, capture_output=True, text=True)
+        sudoers_content = result.stdout.splitlines()
     except FileNotFoundError:
-        print(f"{co.r}[!] Error: sudoers file not found.{co.re}")
+        print("[!] Error: sudoers file not found.")
         return
 
-    # regex wheel 
+    # Pola regex untuk mencari baris yang cocok
     pattern = r"^# (%wheel\s+ALL=\(ALL:ALL\) ALL)$"
     new_line = "%wheel ALL=(ALL:ALL) ALL"
 
     updated_content = []
     for line in sudoers_content:
         if re.match(pattern, line.strip()):
-            updated_content.append(new_line + "\n")  # change the # %wheel ALL=(ALL:ALL) ALL
+            updated_content.append(new_line)  # Mengubah baris yang cocok
         else:
             updated_content.append(line)
 
-    # rewrite sudoers
+    # Menulis kembali isi file sudoers
     try:
-        with open("/etc/sudoers", "w") as file:
-            file.writelines(updated_content)
-        print(f"{co.g}[*] sudoers file has been updated.{co.re}")
+        result = subprocess.run(["arch-chroot", "/mnt", f"echo -e {'\n'.join(updated_content)} | tee /etc/sudoers"], capture_output=True, text=True)
+        if result.returncode == 0:
+            print(f"{co.g}[*] sudoers file has been updated.{co.re}")
+        else:
+            print(f"{co.r}[!] Error updating sudoers file: {result.stderr}{co.re}")
     except PermissionError:
         print(f"{co.r}[!] Error: Permission denied. Make sure you have the necessary permissions to modify the sudoers file.{co.re}")
+
         
 
 ### 0.9 show help ###
@@ -465,7 +495,7 @@ def teaprompt():
         # if user type install
         elif user_input.lower() == 'install':
             if selected_device and selected_device_efi and selected_time_city and selected_time_region and selected_lang and selected_keymap and selected_hostname and selected_username and selected_user_pass and package_list:
-                install_arch(selected_device, selected_device_efi, selected_time_region, selected_time_city, selected_lang, selected_keymap, selected_hostname, selected_username, selected_user_pass, selected_root_pass, selected_DE)
+                install_arch(selected_device, selected_device_efi, selected_time_region, selected_time_city, selected_lang, selected_keymap, selected_hostname, selected_username, selected_user_pass, selected_root_pass, selected_DE, package_list)
             else:
                 print(f"{co.r}[!] select partition first !{co.re}")
         # if user type list time zone
