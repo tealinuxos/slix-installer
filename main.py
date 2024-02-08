@@ -158,7 +158,7 @@ def set_language(locale):
 # make btrfs the device that user input, and then mount it
 # make sure user input package and if not it will be determinate
 # and make all logic that will be execute in arch installation
-def install_arch(selected_device,selected_device_efi,selected_time_region,selected_time_city,selected_lang, selected_keymap,selected_hostname, selected_username, selected_user_pass, selected_root_pass,selected_DE):
+def install_arch(selected_device, selected_device_efi, selected_time_region, selected_time_city, selected_lang, selected_keymap, selected_hostname, selected_username, selected_user_pass, selected_root_pass, selected_DE):
     if selected_device and selected_device_efi:
         print(f"{co.g}Installing Arch Linux with Btrfs on /dev/{selected_device}...{co.re}")
         # Format and mount the selected device
