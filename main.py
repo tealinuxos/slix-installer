@@ -163,7 +163,7 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
         print(f"{co.g}Installing Tea Linux with Btrfs on /dev/{selected_device}...{co.re}")
         
         # Format and mount the selected device
-        subprocess.run(f"mkfs.fat /dev/{selected_device_efi}", shell=True)
+        subprocess.run(f"mkfs.fat -F32 /dev/{selected_device_efi}", shell=True)
         subprocess.run(f"mkfs.btrfs /dev/{selected_device}", shell=True)
         subprocess.run(f"mount /dev/{selected_device} /mnt", shell=True)
         
@@ -181,7 +181,7 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
         subprocess.run("umount /mnt", shell=True)
         
         # Mounting subvolume
-        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@ /dev/{selected_device} /mnt", shell=True)
+        subprocess.run(f"mount -o defaults,noatime,compress=zstd,commit=120,subvol=@ /dev/{selected_device} /mnt", shell=True)
         
         # Create directories
         os.system("mkdir -p /mnt/home")
@@ -192,12 +192,12 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
         os.system("mkdir -p /mnt/var/cache")
         
         # Mounting all subvolumes
-        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@home /dev/{selected_device} /mnt/home", shell=True)
-        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@root /dev/{selected_device} /mnt/root", shell=True) 
-        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@srv /dev/{selected_device} /mnt/srv", shell=True)
-        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@log /dev/{selected_device} /mnt/var/log", shell=True)
-        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@cache /dev/{selected_device} /mnt/var/cache", shell=True)
-        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@tmp /dev/{selected_device} /mnt/tmp", shell=True)
+        subprocess.run(f"mount -o defaults,noatime,compress=zstd,commit=120,subvol=@home /dev/{selected_device} /mnt/home", shell=True)
+        subprocess.run(f"mount -o defaults,noatime,compress=zstd,commit=120,subvol=@root /dev/{selected_device} /mnt/root", shell=True) 
+        subprocess.run(f"mount -o defaults,noatime,compress=zstd,commit=120,subvol=@srv /dev/{selected_device} /mnt/srv", shell=True)
+        subprocess.run(f"mount -o defaults,noatime,compress=zstd,commit=120,subvol=@log /dev/{selected_device} /mnt/var/log", shell=True)
+        subprocess.run(f"mount -o defaults,noatime,compress=zstd,commit=120,subvol=@cache /dev/{selected_device} /mnt/var/cache", shell=True)
+        subprocess.run(f"mount -o defaults,noatime,compress=zstd,commit=120,subvol=@tmp /dev/{selected_device} /mnt/tmp", shell=True)
         
         # Create boot directory
         os.system("mkdir -p /mnt/boot/efi")
