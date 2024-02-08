@@ -1,0 +1,354 @@
+Tea Installer > install
+Installing Tea Linux with Btrfs on /dev/sda2...
+mkfs.fat 4.2 (2021-01-31)
+btrfs-progs v6.5.3
+See https://btrfs.readthedocs.io for more information.
+
+NOTE: several default settings have changed in version 5.15, please make sure
+      this does not affect your deployments:
+      - DUP for metadata (-m dup)
+      - enabled no-holes (-O no-holes)
+      - enabled free-space-tree (-R free-space-tree)
+
+Label:              (null)
+UUID:               b39c1d69-de68-4478-a5d4-492e5aecd326
+Node size:          16384
+Sector size:        4096
+Filesystem size:    13.80GiB
+Block group profiles:
+  Data:             single            8.00MiB
+  Metadata:         DUP             256.00MiB
+  System:           DUP               8.00MiB
+SSD detected:       no
+Zoned device:       no
+Incompat features:  extref, skinny-metadata, no-holes, free-space-tree
+Runtime features:   free-space-tree
+Checksum:           crc32c
+Number of devices:  1
+Devices:
+   ID        SIZE  PATH
+    1    13.80GiB  /dev/sda2
+
+Create subvolume '/mnt/@'
+Create subvolume '/mnt/@home'
+Create subvolume '/mnt/@root'
+Create subvolume '/mnt/@srv'
+Create subvolume '/mnt/@log'
+Create subvolume '/mnt/@cache'
+Create subvolume '/mnt/@tmp'
+ID 256 gen 7 top level 5 path @
+ID 257 gen 7 top level 5 path @home
+ID 258 gen 7 top level 5 path @root
+ID 259 gen 7 top level 5 path @srv
+ID 260 gen 7 top level 5 path @log
+ID 261 gen 7 top level 5 path @cache
+ID 262 gen 7 top level 5 path @tmp
+==> Creating install root at /mnt
+==> Installing packages to /mnt
+:: Synchronizing package databases...
+ core                                      129.3 KiB  34.1 KiB/s 00:04 [########################################] 100%
+ extra                                       8.3 MiB  83.8 KiB/s 01:41 [########################################] 100%
+resolving dependencies...
+:: There are 2 providers available for dbus-units:
+:: Repository core
+   1) dbus-broker-units  2) dbus-daemon-units
+
+Enter a number (default=1): 
+:: There are 3 providers available for initramfs:
+:: Repository core
+   1) mkinitcpio
+:: Repository extra
+   2) booster  3) dracut
+
+Enter a number (default=1): 
+looking for conflicting packages...
+
+Packages (152) acl-2.3.2-1  archlinux-keyring-20231222-1  argon2-20190702-5  attr-2.5.2-1  audit-4.0-1
+               autoconf-2.72-1  automake-1.16.5-2  binutils-2.42-2  bison-3.8.2-6  brotli-1.1.0-1  bzip2-1.0.8-5
+               ca-certificates-20220905-1  ca-certificates-mozilla-3.97-1  ca-certificates-utils-20220905-1
+               coreutils-9.4-3  cryptsetup-2.7.0-1  curl-8.6.0-3  db-6.2.32-1  db5.3-5.3.28-4  dbus-1.14.10-2
+               dbus-broker-35-2  dbus-broker-units-35-2  debugedit-5.0-5  device-mapper-2.03.23-1  diffutils-3.10-1
+               e2fsprogs-1.47.0-1  expat-2.5.0-1  fakeroot-1.33-2  file-5.45-1  filesystem-2024.01.19-1
+               findutils-4.9.0-3  flex-2.6.4-5  gawk-5.3.0-1  gc-8.2.4-1  gcc-13.2.1-5  gcc-libs-13.2.1-5
+               gdbm-1.23-2  gettext-0.22.4-1  glib2-2.78.4-1  glibc-2.39-1  gmp-6.3.0-1  gnupg-2.4.4-1
+               gnutls-3.8.3-1  gpgme-1.23.2-1  grep-3.11-1  groff-1.23.0-5  guile-3.0.9-1  gzip-1.13-2
+               hwdata-0.379-1  iana-etc-20231228-1  icu-74.2-1  iproute2-6.7.0-1  iptables-1:1.8.10-1
+               iputils-20240117-1  jansson-2.14-2  json-c-0.17-1  kbd-2.6.4-1  keyutils-1.6.3-2  kmod-31-1
+               krb5-1.21.2-2  libarchive-3.7.2-1  libassuan-2.5.6-1  libbpf-1.3.0-1  libcap-2.69-3  libcap-ng-0.8.4-1
+               libelf-0.190-2  libevent-2.1.12-4  libffi-3.4.4-1  libgcrypt-1.10.3-1  libgpg-error-1.47-1
+               libidn2-2.3.7-1  libisl-0.26-1  libksba-1.6.5-1  libldap-2.6.6-2  libmnl-1.0.5-1  libmpc-1.3.1-1
+               libnetfilter_conntrack-1.0.9-1  libnfnetlink-1.0.2-1  libnftnl-1.2.6-1  libnghttp2-1.59.0-2
+               libnghttp3-1.1.0-2  libnl-3.9.0-1  libp11-kit-0.25.3-1  libpcap-1.10.4-1  libpsl-0.21.2-1
+               libsasl-2.1.28-4  libseccomp-2.5.5-2  libsecret-0.21.2-1  libssh2-1.11.0-1  libsysprof-capture-45.2-1
+               libtasn1-4.19.0-1  libtirpc-1.3.4-1  libtool-2.4.7+4+g1ec8fa28-7  libunistring-1.1-2  libusb-1.0.27-1
+               libutempter-1.2.1-4  libverto-0.3.2-4  libxcrypt-4.4.36-1  libxml2-2.12.5-1  licenses-20240206-1
+               linux-api-headers-6.7-1  linux-firmware-whence-20240115.9b6d0b08-2  lz4-1:1.9.4-2  lzo-2.10-5
+               m4-1.4.19-3  make-4.4.1-2  mkinitcpio-37.3-1  mkinitcpio-busybox-1.36.1-1  mpfr-4.2.1-2
+               ncurses-6.4_20230520-1  nettle-3.9.1-1  npth-1.6-4  openssl-3.2.1-1  p11-kit-0.25.3-1  pacman-6.0.2-9
+               pacman-mirrorlist-20231001-1  pam-1.6.0-3  pambase-20230918-1  patch-2.7.6-10  pciutils-3.10.0-1
+               pcre2-10.42-2  perl-5.38.1-1  pinentry-1.2.1-3  pkgconf-2.1.0-2  popt-1.19-1  procps-ng-4.0.4-2
+               psmisc-23.6-1  readline-8.2.010-1  sed-4.9-3  shadow-4.14.3-1  sqlite-3.45.1-1  sudo-1.9.15.p5-1
+               systemd-255.3-1  systemd-libs-255.3-1  systemd-sysvcompat-255.3-1  tar-1.35-2  texinfo-7.1-2
+               tpm2-tss-4.0.1-1  tzdata-2024a-1  util-linux-2.39.3-1  util-linux-libs-2.39.3-1  which-2.21-6
+               xz-5.4.6-1  zlib-1:1.3.1-1  zstd-1.5.5-1  base-3-2  base-devel-1-1  bash-5.2.026-2  btrfs-progs-6.7-1
+               grub-2:2.12-1  linux-6.7.4.arch1-1  linux-firmware-20240115.9b6d0b08-2
+
+Total Download Size:    576.80 MiB
+Total Installed Size:  1320.93 MiB
+
+:: Proceed with installation? [Y/n] 
+:: Retrieving packages...
+ linux-firmware-20240115.9b6d0b08-2-any    212.0 MiB  87.1 KiB/s 41:33 [########################################] 100%
+ linux-6.7.4.arch1-1-x86_64                130.7 MiB   101 KiB/s 22:05 [########################################] 100%
+ gcc-13.2.1-5-x86_64                        46.8 MiB   102 KiB/s 07:49 [########################################] 100%
+ gcc-libs-13.2.1-5-x86_64                   35.3 MiB   101 KiB/s 05:58 [########################################] 100%
+ perl-5.38.1-1-x86_64                       20.2 MiB   111 KiB/s 03:06 [########################################] 100%
+ icu-74.2-1-x86_64                          11.1 MiB  83.8 KiB/s 02:16 [########################################] 100%
+ glibc-2.39-1-x86_64                         9.9 MiB   121 KiB/s 01:24 [########################################] 100%
+ guile-3.0.9-1-x86_64                        8.1 MiB   110 KiB/s 01:15 [########################################] 100%
+ systemd-255.3-1-x86_64                      8.1 MiB  87.8 KiB/s 01:34 [########################################] 100%
+ binutils-2.42-2-x86_64                      7.6 MiB   115 KiB/s 01:08 [########################################] 100%
+ grub-2:2.12-1-x86_64                        6.8 MiB  99.1 KiB/s 01:11 [########################################] 100%
+ openssl-3.2.1-1-x86_64                      4.9 MiB  87.1 KiB/s 00:58 [########################################] 100%
+ glib2-2.78.4-1-x86_64                       3.8 MiB  89.5 KiB/s 00:44 [########################################] 100%
+ coreutils-9.4-3-x86_64                      2.8 MiB   112 KiB/s 00:25 [########################################] 100%
+ util-linux-2.39.3-1-x86_64                  2.8 MiB  95.1 KiB/s 00:30 [########################################] 100%
+ gnutls-3.8.3-1-x86_64                       2.8 MiB  87.7 KiB/s 00:32 [########################################] 100%
+ gnupg-2.4.4-1-x86_64                        2.7 MiB  84.4 KiB/s 00:33 [########################################] 100%
+ groff-1.23.0-5-x86_64                       2.3 MiB   168 KiB/s 00:14 [########################################] 100%
+ sudo-1.9.15.p5-1-x86_64                  1922.6 KiB   110 KiB/s 00:17 [########################################] 100%
+ gettext-0.22.4-1-x86_64                  1885.3 KiB  69.1 KiB/s 00:27 [########################################] 100%
+ bash-5.2.026-2-x86_64                    1854.2 KiB  76.0 KiB/s 00:24 [########################################] 100%
+ texinfo-7.1-2-x86_64                     1718.1 KiB  63.3 KiB/s 00:27 [########################################] 100%
+ sqlite-3.45.1-1-x86_64                   1704.4 KiB  88.7 KiB/s 00:19 [########################################] 100%
+ hwdata-0.379-1-any                       1620.0 KiB  92.8 KiB/s 00:17 [########################################] 100%
+ pcre2-10.42-2-x86_64                     1468.6 KiB  78.7 KiB/s 00:19 [########################################] 100%
+ db-6.2.32-1-x86_64                       1360.3 KiB  94.4 KiB/s 00:14 [########################################] 100%
+ gawk-5.3.0-1-x86_64                      1321.8 KiB   143 KiB/s 00:09 [########################################] 100%
+ krb5-1.21.2-2-x86_64                     1310.1 KiB  83.8 KiB/s 00:16 [########################################] 100%
+ kbd-2.6.4-1-x86_64                       1278.1 KiB   183 KiB/s 00:07 [########################################] 100%
+ linux-api-headers-6.7-1-any              1264.0 KiB  79.9 KiB/s 00:16 [########################################] 100%
+ e2fsprogs-1.47.0-1-x86_64                1225.9 KiB  99.2 KiB/s 00:12 [########################################] 100%
+ db5.3-5.3.28-4-x86_64                    1224.2 KiB  75.0 KiB/s 00:16 [########################################] 100%
+ btrfs-progs-6.7-1-x86_64                 1222.7 KiB  93.3 KiB/s 00:13 [########################################] 100%
+ archlinux-keyring-20231222-1-any         1186.2 KiB   149 KiB/s 00:08 [########################################] 100%
+ ncurses-6.4_20230520-1-x86_64            1184.0 KiB   107 KiB/s 00:11 [########################################] 100%
+ shadow-4.14.3-1-x86_64                   1179.5 KiB  84.7 KiB/s 00:14 [########################################] 100%
+ iproute2-6.7.0-1-x86_64                  1119.9 KiB  98.2 KiB/s 00:11 [########################################] 100%
+ systemd-libs-255.3-1-x86_64              1106.9 KiB  97.2 KiB/s 00:11 [########################################] 100%
+ curl-8.6.0-3-x86_64                      1086.1 KiB  95.4 KiB/s 00:11 [########################################] 100%
+ tpm2-tss-4.0.1-1-x86_64                   964.5 KiB  99.4 KiB/s 00:10 [########################################] 100%
+ procps-ng-4.0.4-2-x86_64                  941.9 KiB  72.7 KiB/s 00:13 [########################################] 100%
+ pacman-6.0.2-9-x86_64                     923.0 KiB   147 KiB/s 00:06 [########################################] 100%
+ pam-1.6.0-3-x86_64                        913.9 KiB   105 KiB/s 00:09 [########################################] 100%
+ libisl-0.26-1-x86_64                      873.3 KiB  90.1 KiB/s 00:10 [########################################] 100%
+ libxml2-2.12.5-1-x86_64                   843.5 KiB   133 KiB/s 00:06 [########################################] 100%
+ tar-1.35-2-x86_64                         777.6 KiB   189 KiB/s 00:04 [########################################] 100%
+ bison-3.8.2-6-x86_64                      772.5 KiB   210 KiB/s 00:04 [########################################] 100%
+ cryptsetup-2.7.0-1-x86_64                 755.0 KiB   158 KiB/s 00:05 [########################################] 100%
+ libcap-2.69-3-x86_64                      694.6 KiB  83.4 KiB/s 00:08 [########################################] 100%
+ libunistring-1.1-2-x86_64                 673.3 KiB  49.4 KiB/s 00:14 [########################################] 100%
+ autoconf-2.72-1-any                       650.5 KiB   115 KiB/s 00:06 [########################################] 100%
+ xz-5.4.6-1-x86_64                         613.9 KiB   123 KiB/s 00:05 [########################################] 100%
+ automake-1.16.5-2-any                     612.8 KiB  91.6 KiB/s 00:07 [########################################] 100%
+ libgcrypt-1.10.3-1-x86_64                 594.3 KiB  93.0 KiB/s 00:06 [########################################] 100%
+ libelf-0.190-2-x86_64                     553.2 KiB  68.3 KiB/s 00:08 [########################################] 100%
+ libarchive-3.7.2-1-x86_64                 533.9 KiB  60.6 KiB/s 00:09 [########################################] 100%
+ make-4.4.1-2-x86_64                       523.8 KiB  57.6 KiB/s 00:09 [########################################] 100%
+ libp11-kit-0.25.3-1-x86_64                514.5 KiB  79.9 KiB/s 00:06 [########################################] 100%
+ lz4-1:1.9.4-2-x86_64                      509.5 KiB  60.3 KiB/s 00:08 [########################################] 100%
+ gpgme-1.23.2-1-x86_64                     483.6 KiB  98.1 KiB/s 00:05 [########################################] 100%
+ zstd-1.5.5-1-x86_64                       481.5 KiB   118 KiB/s 00:04 [########################################] 100%
+ nettle-3.9.1-1-x86_64                     456.4 KiB   106 KiB/s 00:04 [########################################] 100%
+ util-linux-libs-2.39.3-1-x86_64           446.0 KiB  79.5 KiB/s 00:06 [########################################] 100%
+ gmp-6.3.0-1-x86_64                        443.5 KiB  75.6 KiB/s 00:06 [########################################] 100%
+ iptables-1:1.8.10-1-x86_64                436.4 KiB   124 KiB/s 00:04 [########################################] 100%
+ mpfr-4.2.1-2-x86_64                       427.9 KiB  93.0 KiB/s 00:05 [########################################] 100%
+ findutils-4.9.0-3-x86_64                  417.9 KiB  74.6 KiB/s 00:06 [########################################] 100%
+ libnl-3.9.0-1-x86_64                      414.8 KiB  74.0 KiB/s 00:06 [########################################] 100%
+ libtool-2.4.7+4+g1ec8fa28-7-x86_64        412.5 KiB  63.9 KiB/s 00:06 [########################################] 100%
+ iana-etc-20231228-1-any                   399.5 KiB   118 KiB/s 00:03 [########################################] 100%
+ file-5.45-1-x86_64                        395.8 KiB  83.7 KiB/s 00:05 [########################################] 100%
+ audit-4.0-1-x86_64                        387.2 KiB  56.8 KiB/s 00:07 [########################################] 100%
+ tzdata-2024a-1-x86_64                     386.4 KiB  48.0 KiB/s 00:08 [########################################] 100%
+ brotli-1.1.0-1-x86_64                     385.2 KiB  77.7 KiB/s 00:05 [########################################] 100%
+ ca-certificates-mozilla-3.97-1-x86_64     364.3 KiB  88.0 KiB/s 00:04 [########################################] 100%
+ diffutils-3.10-1-x86_64                   344.6 KiB  91.5 KiB/s 00:04 [########################################] 100%
+ readline-8.2.010-1-x86_64                 323.4 KiB  79.9 KiB/s 00:04 [########################################] 100%
+ flex-2.6.4-5-x86_64                       307.5 KiB  56.6 KiB/s 00:05 [########################################] 100%
+ dbus-1.14.10-2-x86_64                     304.9 KiB   109 KiB/s 00:03 [########################################] 100%
+ libpcap-1.10.4-1-x86_64                   285.0 KiB  65.1 KiB/s 00:04 [########################################] 100%
+ device-mapper-2.03.23-1-x86_64            282.8 KiB  64.5 KiB/s 00:04 [########################################] 100%
+ libldap-2.6.6-2-x86_64                    280.4 KiB  93.6 KiB/s 00:03 [########################################] 100%
+ mkinitcpio-busybox-1.36.1-1-x86_64        277.5 KiB  63.4 KiB/s 00:04 [########################################] 100%
+ libevent-2.1.12-4-x86_64                  267.4 KiB  92.6 KiB/s 00:03 [########################################] 100%
+ gdbm-1.23-2-x86_64                        265.2 KiB  89.1 KiB/s 00:03 [########################################] 100%
+ psmisc-23.6-1-x86_64                      250.7 KiB  84.2 KiB/s 00:03 [########################################] 100%
+ libbpf-1.3.0-1-x86_64                     248.3 KiB  59.1 KiB/s 00:04 [########################################] 100%
+ m4-1.4.19-3-x86_64                        246.0 KiB  70.2 KiB/s 00:04 [########################################] 100%
+ libgpg-error-1.47-1-x86_64                244.0 KiB  69.5 KiB/s 00:04 [########################################] 100%
+ libssh2-1.11.0-1-x86_64                   236.2 KiB  41.8 KiB/s 00:06 [########################################] 100%
+ gc-8.2.4-1-x86_64                         234.3 KiB  66.9 KiB/s 00:04 [########################################] 100%
+ grep-3.11-1-x86_64                        233.6 KiB  94.9 KiB/s 00:02 [########################################] 100%
+ p11-kit-0.25.3-1-x86_64                   231.1 KiB  77.6 KiB/s 00:03 [########################################] 100%
+ sed-4.9-3-x86_64                          210.5 KiB  74.8 KiB/s 00:03 [########################################] 100%
+ libsecret-0.21.2-1-x86_64                 190.4 KiB  56.6 KiB/s 00:03 [########################################] 100%
+ libtirpc-1.3.4-1-x86_64                   174.2 KiB  90.3 KiB/s 00:02 [########################################] 100%
+ dbus-broker-35-2-x86_64                   150.7 KiB  86.1 KiB/s 00:02 [########################################] 100%
+ libsasl-2.1.28-4-x86_64                   147.5 KiB  70.0 KiB/s 00:02 [########################################] 100%
+ libidn2-2.3.7-1-x86_64                    139.8 KiB  56.8 KiB/s 00:02 [########################################] 100%
+ libksba-1.6.5-1-x86_64                    139.5 KiB  41.4 KiB/s 00:03 [########################################] 100%
+ libtasn1-4.19.0-1-x86_64                  139.1 KiB  60.7 KiB/s 00:02 [########################################] 100%
+ acl-2.3.2-1-x86_64                        137.8 KiB  65.5 KiB/s 00:02 [########################################] 100%
+ pinentry-1.2.1-3-x86_64                   132.6 KiB  75.8 KiB/s 00:02 [########################################] 100%
+ iputils-20240117-1-x86_64                 124.2 KiB  50.6 KiB/s 00:02 [########################################] 100%
+ kmod-31-1-x86_64                          119.8 KiB  45.6 KiB/s 00:03 [########################################] 100%
+ pciutils-3.10.0-1-x86_64                  117.0 KiB  55.6 KiB/s 00:02 [########################################] 100%
+ expat-2.5.0-1-x86_64                      114.3 KiB  58.1 KiB/s 00:02 [########################################] 100%
+ libassuan-2.5.6-1-x86_64                  106.2 KiB  37.8 KiB/s 00:03 [########################################] 100%
+ licenses-20240206-1-any                   105.6 KiB  35.5 KiB/s 00:03 [########################################] 100%
+ keyutils-1.6.3-2-x86_64                   101.8 KiB  41.5 KiB/s 00:02 [########################################] 100%
+ libnghttp2-1.59.0-2-x86_64                 96.3 KiB  55.0 KiB/s 00:02 [########################################] 100%
+ patch-2.7.6-10-x86_64                      93.0 KiB  36.8 KiB/s 00:03 [########################################] 100%
+ zlib-1:1.3.1-1-x86_64                      92.6 KiB  45.8 KiB/s 00:02 [########################################] 100%
+ libseccomp-2.5.5-2-x86_64                  88.8 KiB  38.0 KiB/s 00:02 [########################################] 100%
+ lzo-2.10-5-x86_64                          87.8 KiB  52.4 KiB/s 00:02 [########################################] 100%
+ libmpc-1.3.1-1-x86_64                      84.2 KiB  50.0 KiB/s 00:02 [########################################] 100%
+ libxcrypt-4.4.36-1-x86_64                  84.2 KiB  51.7 KiB/s 00:02 [########################################] 100%
+ libpsl-0.21.2-1-x86_64                     81.8 KiB  41.5 KiB/s 00:02 [########################################] 100%
+ gzip-1.13-2-x86_64                         81.5 KiB  46.5 KiB/s 00:02 [########################################] 100%
+ fakeroot-1.33-2-x86_64                     76.7 KiB  53.1 KiB/s 00:01 [########################################] 100%
+ popt-1.19-1-x86_64                         75.6 KiB  33.2 KiB/s 00:02 [########################################] 100%
+ libusb-1.0.27-1-x86_64                     73.6 KiB  69.8 KiB/s 00:01 [########################################] 100%
+ libnghttp3-1.1.0-2-x86_64                  72.3 KiB  31.7 KiB/s 00:02 [########################################] 100%
+ libnftnl-1.2.6-1-x86_64                    69.5 KiB  39.3 KiB/s 00:02 [########################################] 100%
+ attr-2.5.2-1-x86_64                        68.4 KiB  48.8 KiB/s 00:01 [########################################] 100%
+ pkgconf-2.1.0-2-x86_64                     61.5 KiB  42.9 KiB/s 00:01 [########################################] 100%
+ bzip2-1.0.8-5-x86_64                       58.4 KiB  47.6 KiB/s 00:01 [########################################] 100%
+ json-c-0.17-1-x86_64                       57.0 KiB  45.4 KiB/s 00:01 [########################################] 100%
+ mkinitcpio-37.3-1-any                      53.1 KiB  37.4 KiB/s 00:01 [########################################] 100%
+ jansson-2.14-2-x86_64                      51.7 KiB  35.7 KiB/s 00:01 [########################################] 100%
+ libnetfilter_conntrack-1.0.9-1-x86_64      49.0 KiB  63.9 KiB/s 00:01 [########################################] 100%
+ libsysprof-capture-45.2-1-x86_64           47.2 KiB  42.9 KiB/s 00:01 [########################################] 100%
+ libffi-3.4.4-1-x86_64                      45.3 KiB  36.9 KiB/s 00:01 [########################################] 100%
+ debugedit-5.0-5-x86_64                     43.5 KiB  55.8 KiB/s 00:01 [########################################] 100%
+ libcap-ng-0.8.4-1-x86_64                   42.2 KiB  40.1 KiB/s 00:01 [########################################] 100%
+ linux-firmware-whence-20240115.9b6d0...    33.9 KiB  32.2 KiB/s 00:01 [########################################] 100%
+ argon2-20190702-5-x86_64                   32.8 KiB  26.8 KiB/s 00:01 [########################################] 100%
+ npth-1.6-4-x86_64                          24.1 KiB  45.8 KiB/s 00:01 [########################################] 100%
+ libverto-0.3.2-4-x86_64                    18.4 KiB  52.1 KiB/s 00:00 [########################################] 100%
+ libnfnetlink-1.0.2-1-x86_64                17.1 KiB  48.0 KiB/s 00:00 [########################################] 100%
+ which-2.21-6-x86_64                        15.8 KiB  30.0 KiB/s 00:01 [########################################] 100%
+ filesystem-2024.01.19-1-any                14.4 KiB  20.6 KiB/s 00:01 [########################################] 100%
+ libmnl-1.0.5-1-x86_64                      11.2 KiB  15.9 KiB/s 00:01 [########################################] 100%
+ ca-certificates-utils-20220905-1-any       10.3 KiB  19.6 KiB/s 00:01 [########################################] 100%
+ libutempter-1.2.1-4-x86_64                  9.5 KiB  27.0 KiB/s 00:00 [########################################] 100%
+ pacman-mirrorlist-20231001-1-any            8.2 KiB  46.4 KiB/s 00:00 [########################################] 100%
+ systemd-sysvcompat-255.3-1-x86_64           6.1 KiB  34.4 KiB/s 00:00 [########################################] 100%
+ pambase-20230918-1-any                      3.1 KiB  8.88 KiB/s 00:00 [########################################] 100%
+ dbus-broker-units-35-2-x86_64               2.4 KiB  13.6 KiB/s 00:00 [########################################] 100%
+ base-3-2-any                                2.3 KiB  13.0 KiB/s 00:00 [########################################] 100%
+ ca-certificates-20220905-1-any              2.0 KiB  11.4 KiB/s 00:00 [########################################] 100%
+ base-devel-1-1-any                          2.0 KiB  11.2 KiB/s 00:00 [########################################] 100%
+ Total (152/152)                           576.8 MiB  93.2 KiB/s --:-- [########################################] 100%
+(152/152) checking keys in keyring                                     [########################################] 100%
+downloading required keys...
+:: Import PGP key B8AC08600F108CDF, "Jan Alexander Steffens (heftig) <heftig@archlinux.org>"? [Y/n] 
+:: Import PGP key 244740D17C7FD0EC, "Leonidas Spyropoulos <artafinde@archlinux.org>"? [Y/n] 
+(152/152) checking package integrity                                   [########################################] 100%
+error: zlib: signature from "Levente Polyak (anthraxx) <levente@leventepolyak.net>" is unknown trust
+:: File /mnt/var/cache/pacman/pkg/zlib-1:1.3.1-1-x86_64.pkg.tar.zst is corrupted (invalid or corrupted package (PGP signature)).
+Do you want to delete it? [Y/n] 
+error: brotli: signature from "Levente Polyak (anthraxx) <levente@leventepolyak.net>" is unknown trust
+:: File /mnt/var/cache/pacman/pkg/brotli-1.1.0-1-x86_64.pkg.tar.zst is corrupted (invalid or corrupted package (PGP signature)).
+Do you want to delete it? [Y/n] 
+error: base-devel: signature from "Levente Polyak (anthraxx) <levente@leventepolyak.net>" is unknown trust
+:: File /mnt/var/cache/pacman/pkg/base-devel-1-1-any.pkg.tar.zst is corrupted (invalid or corrupted package (PGP signature)).
+Do you want to delete it? [Y/n] 
+error: failed to commit transaction (invalid or corrupted package)
+Errors occurred, no packages were upgraded.
+==> ERROR: Failed to install packages to new root
+[*] fstab successfully created
+[*] Installing additional packages: sqlmap, nmap, neofetch
+==> Creating install root at /mnt
+==> Installing packages to /mnt
+:: Synchronizing package databases...
+ core is up to date
+ extra                                       8.3 MiB   109 KiB/s 01:18 [########################################] 100%
+resolving dependencies...
+looking for conflicting packages...
+
+Packages (47) audit-4.0-1  bash-5.2.026-2  bzip2-1.0.8-5  dbus-1.14.10-2  e2fsprogs-1.47.0-1  expat-2.5.0-1
+              filesystem-2024.01.19-1  gcc-libs-13.2.1-5  gdbm-1.23-2  glibc-2.39-1  iana-etc-20231228-1
+              keyutils-1.6.3-2  krb5-1.21.2-2  libcap-2.69-3  libcap-ng-0.8.4-1  libevent-2.1.12-4  libffi-3.4.4-1
+              libgcrypt-1.10.3-1  libgpg-error-1.47-1  libldap-2.6.6-2  libnl-3.9.0-1  libnsl-2.0.1-1
+              libpcap-1.10.4-1  libsasl-2.1.28-4  libssh2-1.11.0-1  libtirpc-1.3.4-1  libverto-0.3.2-4
+              libxcrypt-4.4.36-1  linux-api-headers-6.7-1  lua-5.4.6-3  lz4-1:1.9.4-2  ncurses-6.4_20230520-1
+              openssl-3.2.1-1  pam-1.6.0-3  pambase-20230918-1  pcre-8.45-4  python-3.11.6-1  readline-8.2.010-1
+              systemd-libs-255.3-1  tzdata-2024a-1  util-linux-libs-2.39.3-1  xz-5.4.6-1  zlib-1:1.3.1-1
+              zstd-1.5.5-1  neofetch-7.1.0-2  nmap-7.94-2  sqlmap-1.7.12-1
+
+Total Download Size:    28.82 MiB
+Total Installed Size:  388.54 MiB
+
+:: Proceed with installation? [Y/n] 
+:: Retrieving packages...
+ python-3.11.6-1-x86_64                     13.9 MiB  96.6 KiB/s 02:28 [########################################] 100%
+ sqlmap-1.7.12-1-any                         7.8 MiB  76.1 KiB/s 01:44 [########################################] 100%
+ nmap-7.94-2-x86_64                          5.6 MiB   113 KiB/s 00:51 [########################################] 100%
+ pcre-8.45-4-x86_64                       1000.8 KiB  74.0 KiB/s 00:14 [########################################] 100%
+ lua-5.4.6-3-x86_64                        362.2 KiB  54.3 KiB/s 00:07 [########################################] 100%
+ zlib-1:1.3.1-1-x86_64                      92.6 KiB  57.1 KiB/s 00:02 [########################################] 100%
+ neofetch-7.1.0-2-any                       83.1 KiB  38.5 KiB/s 00:02 [########################################] 100%
+ libnsl-2.0.1-1-x86_64                      21.7 KiB  59.8 KiB/s 00:00 [########################################] 100%
+ Total (8/8)                                28.8 MiB  89.8 KiB/s 05:29 [########################################] 100%
+(47/47) checking keys in keyring                                       [########################################] 100%
+(47/47) checking package integrity                                     [########################################] 100%
+error: zlib: signature from "Levente Polyak (anthraxx) <levente@leventepolyak.net>" is unknown trust
+:: File /mnt/var/cache/pacman/pkg/zlib-1:1.3.1-1-x86_64.pkg.tar.zst is corrupted (invalid or corrupted package (PGP signature)).
+Do you want to delete it? [Y/n] 
+error: failed to commit transaction (invalid or corrupted package)
+Errors occurred, no packages were upgraded.
+==> ERROR: Failed to install packages to new root
+[*] Additional packages installed.
+chroot: failed to run command ‘/bin/bash’: No such file or directory
+chroot: failed to run command ‘ln’: No such file or directory
+chroot: failed to run command ‘hwclock’: No such file or directory
+[*] Timezone set to Asia/Jakarta
+chroot: failed to run command ‘sed’: No such file or directory
+chroot: failed to run command ‘locale-gen’: No such file or directory
+chroot: failed to run command ‘echo’: No such file or directory
+[*] Language set to en_US.UTF8
+chroot: failed to run command ‘echo’: No such file or directory
+[*] Keymap set to us
+chroot: failed to run command ‘echo’: No such file or directory
+[*] Hostname was set to TeaLinux
+==> ERROR: Can't create chroot on non-directory /mmt
+/bin/sh: line 3: 127.0.0.1: command not found
+/bin/sh: line 4: ::1: command not found
+/bin/sh: line 5: 127.0.0.1: command not found
+[*] Content has been added to /etc/hosts.
+chroot: failed to run command ‘pacman’: No such file or directory
+[!] You not setting root pass ..
+[-] Grub installation failed. Please check for errors.
+[!] error: chroot: failed to run command ‘grub-install’: No such file or directory
+
+[!] error: chroot: failed to run command ‘grub-mkconfig’: No such file or directory
+
+==> ERROR: Can't create chroot on non-directory useradd
+[!] Error creating user 'x0r': Command '['arch-chroot useradd -m -g users -G audio,video,network,wheel,storage,rfkill -s /bin/bash x0r']' returned non-zero exit status 1.
+[!] Error updating sudoers file: chroot: failed to run command ‘sh’: No such file or directory
+
+chroot: failed to run command ‘pacman’: No such file or directory
+Traceback (most recent call last):
+  File "/root/main.py", line 633, in <module>
+    teaprompt()
+  File "/root/main.py", line 499, in teaprompt
+    install_arch(selected_device, selected_device_efi, selected_time_region, selected_time_city, selected_lang, selected_keymap, selected_hostname, selected_username, selected_user_pass, selected_root_pass, selected_DE, package_list)
+  File "/root/main.py", line 254, in install_arch
+    install_desktop_environment(selected_DE)
+  File "/root/main.py", line 388, in install_desktop_environment
+    subprocess.run(["arch-chroot /mnt pacman -S --noconfirm gnome gnome-tweaks gdm xorg-server xorg-apps xorg-xinit xterm pipewire pipewire-pulse && systemctl start gdm.service && systemctl enable gdm.service -f && systemctl --user --now enable pipewire pipewire-pulse"], shell=True, check=True)
+  File "/usr/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['arch-chroot /mnt pacman -S --noconfirm gnome gnome-tweaks gdm xorg-server xorg-apps xorg-xinit xterm pipewire pipewire-pulse && systemctl start gdm.service && systemctl enable gdm.service -f && systemctl --user --now enable pipewire pipewire-pulse']' returned non-zero exit status 127.
