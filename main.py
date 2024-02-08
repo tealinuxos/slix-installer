@@ -161,94 +161,90 @@ def set_language(locale):
 def install_arch(selected_device, selected_device_efi, selected_time_region, selected_time_city, selected_lang, selected_keymap, selected_hostname, selected_username, selected_user_pass, selected_root_pass, selected_DE):
     if selected_device and selected_device_efi:
         print(f"{co.g}Installing Tea Linux with Btrfs on /dev/{selected_device}...{co.re}")
+        
         # Format and mount the selected device
-        subprocess.run(["mkfs.fat", f"/dev/{selected_device_efi}"])
-        subprocess.run(["mkfs.btrfs", f"/dev/{selected_device}"])
-        subprocess.run(["mount", f"/dev/{selected_device}", "/mnt"])
-
+        subprocess.run(f"mkfs.fat /dev/{selected_device_efi}", shell=True)
+        subprocess.run(f"mkfs.btrfs /dev/{selected_device}", shell=True)
+        subprocess.run(f"mount /dev/{selected_device} /mnt", shell=True)
+        
         # Create subvolumes for root and home
-        subprocess.run(["btrfs", "su", "cr", "/mnt/@"])
-        subprocess.run(["btrfs", "su", "cr", "/mnt/@home"])
-        subprocess.run(["btrfs", "su", "cr", "/mnt/@root"])
-        subprocess.run(["btrfs", "su", "cr", "/mnt/@srv"])
-        subprocess.run(["btrfs", "su", "cr", "/mnt/@log"])
-        subprocess.run(["btrfs", "su", "cr", "/mnt/@cache"])
-        subprocess.run(["btrfs", "su", "cr", "/mnt/@tmp"])
-        subprocess.run(["btrfs", "su", "li", "/mnt"])
+        subprocess.run("btrfs su cr /mnt/@", shell=True)
+        subprocess.run("btrfs su cr /mnt/@home", shell=True)
+        subprocess.run("btrfs su cr /mnt/@root", shell=True)
+        subprocess.run("btrfs su cr /mnt/@srv", shell=True)
+        subprocess.run("btrfs su cr /mnt/@log", shell=True)
+        subprocess.run("btrfs su cr /mnt/@cache", shell=True)
+        subprocess.run("btrfs su cr /mnt/@tmp", shell=True)
+        subprocess.run("btrfs su li /mnt", shell=True)
         
-        # umounting
-        #subprocess.run(["cd", "/"])
-        subprocess.run(["umount", "/mnt"])
+        # Unmounting
+        subprocess.run("umount /mnt", shell=True)
         
-        # mounting subvolume
-        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@", f"/dev/{selected_device}", "/mnt"])
-
-        # make dir
+        # Mounting subvolume
+        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@ /dev/{selected_device} /mnt", shell=True)
+        
+        # Create directories
         os.system("mkdir -p /mnt/home")
         os.system("mkdir -p /mnt/root")
         os.system("mkdir -p /mnt/srv")
         os.system("mkdir -p /mnt/tmp")
         os.system("mkdir -p /mnt/var/log")
         os.system("mkdir -p /mnt/var/cache")
-
-        # mounting all subvolume
-        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@home", f"/dev/{selected_device}", "/mnt/home"])
-        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@root", f"/dev/{selected_device}", "/mnt/root"]) 
-        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@srv", f"/dev/{selected_device}", "/mnt/srv"])
-        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@log", f"/dev/{selected_device}", "/mnt/var/log"])
-        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@cache", f"/dev/{selected_device}", "/mnt/var/cache"])
-        subprocess.run(["mount", "-o", "defaus,noatime,compress=zstd,commit=120,subvol=@tmp", f"/dev/{selected_device}", "/mnt/tmp"])
-
-        # make dir boot
+        
+        # Mounting all subvolumes
+        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@home /dev/{selected_device} /mnt/home", shell=True)
+        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@root /dev/{selected_device} /mnt/root", shell=True) 
+        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@srv /dev/{selected_device} /mnt/srv", shell=True)
+        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@log /dev/{selected_device} /mnt/var/log", shell=True)
+        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@cache /dev/{selected_device} /mnt/var/cache", shell=True)
+        subprocess.run(f"mount -o defaus,noatime,compress=zstd,commit=120,subvol=@tmp /dev/{selected_device} /mnt/tmp", shell=True)
+        
+        # Create boot directory
         os.system("mkdir -p /mnt/boot/efi")
-        subprocess.run(["mount", f"/dev/{selected_device_efi}", "/mnt/boot/efi"])
-
+        subprocess.run(f"mount /dev/{selected_device_efi} /mnt/boot/efi", shell=True)
+        
         # Install Arch Linux base system
-        subprocess.run(["pacstrap", "/mnt", "base", "base-devel", "linux", "linux-firmware", "btrfs-progs", "grub", "bash"])
+        subprocess.run("pacstrap /mnt base base-devel linux linux-firmware btrfs-progs grub bash", shell=True)
         
-        # genfstab
-        subprocess.run(["genfstab", "-U", "/mnt", ">>", "/mnt/etc/fstab"])
+        # Generate fstab
+        subprocess.run("genfstab -U /mnt >> /mnt/etc/fstab", shell=True)
         
-        # arch chroot !!
-        subprocess.run(["arch-chroot", "/mnt"])
+        # Arch chroot
+        subprocess.run("arch-chroot /mnt", shell=True)
         
-        # setting time
+        # Set time, language, keymap, hostname, hosts
         set_time(selected_time_region, selected_time_city)
-        # setting language
         set_language(selected_lang)
-        # setting keymaps
         set_keymap(selected_keymap)
-        # setting hostname
         set_hostname(selected_hostname)
-        # setting hosts
         write_to_hosts_file()
-        # install network manager
+        
+        # Install network manager
         os.system("pacman -S --noconfirm networkmanager grub efibootmgr && systemctl enable NetworkManager")
-        # change root pass
+        
+        # Change root password
         if selected_root_pass:
             set_root_pass(selected_root_pass)
-        else:
-            pass
         # Install Grub
-        install_grub = subprocess.run(["grub-install", "--target=x86_64-efi", "--efi-directory=/boot/efi"], capture_output=True, text=True)
-        # Check if installation finished without error
+        install_grub = subprocess.run("grub-install --target=x86_64-efi --efi-directory=/boot/efi", shell=True, capture_output=True, text=True)
         if install_grub.returncode == 0 and "Installation finished. No error reported." in install_grub.stdout:
             print(f"{co.g}[*] Install Grub Finished{co.re}")
         else:
-            print(f"{co.g}[-] Grub installation failed. Please check for errors.{co.re}")
-        # grub mkconfig
-        mkgrub = subprocess.run(["grub-mkconfig", "-O", "/boot/grub/grub.cfg"], capture_output=True, text=True)
-        if mkgrub == 0 and "Found linux image:" and "Found initrd image:" and "Found fallback initrd image(s) in /boot:" in mkgrub.stdout:
+            print(f"{co.r}[-] Grub installation failed. Please check for errors.{co.re}")
+        # Generate Grub config
+        mkgrub = subprocess.run("grub-mkconfig -O /boot/grub/grub.cfg", shell=True, capture_output=True, text=True)
+        if mkgrub.returncode == 0 and "Found linux image:" in mkgrub.stdout and "Found initrd image:" in mkgrub.stdout and "Found fallback initrd image(s) in /boot:" in mkgrub.stdout:
             print(f"{co.g}[*] Grub config was created successfully.{co.re}")
         else:
-            print(f"{co.g}[-] Grub config failed to install ...{co.re}")
-        # created non root user
+            print(f"{co.r}[-] Grub config failed to install ...{co.re}")
+        # Create non-root user
         set_user_pass(selected_username, selected_user_pass)
-        # update sudoers
+        
+        # Update sudoers
         update_sudoers()
-        # install DE
+        
+        # Install desktop environment
         install_desktop_environment(selected_DE)
-
     else:
         print("Please set a device using 'set /dev/(device_name)' before installing.")
 
