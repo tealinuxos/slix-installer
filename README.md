@@ -1,9 +1,8 @@
 # brewix-installer
 
 list error:
-- line 213:<br>
-code: ```subprocess.run("arch-chroot /mnt", shell=True)```<br>error: ```chroot: failed to run command ‘/bin/bash’: No such file or directory```
-
+- line 217
+- check error.log for more
 task :
 
 - help menu: will update
