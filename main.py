@@ -447,7 +447,7 @@ def teaprompt():
             selected_device_efi = set_device_efi(user_input[8:], device_names) 
 
 
-        # if user type 
+        # if user type install
         elif user_input.lower() == 'install':
             if selected_device and selected_device_efi and selected_time_city and selected_time_region and selected_lang and selected_keymap and selected_hostname and selected_username and selected_user_pass and package_list:
                 install_arch(selected_device, selected_device_efi, selected_time_region, selected_time_city, selected_lang, selected_keymap, selected_hostname, selected_username, selected_user_pass, selected_root_pass, selected_DE)
