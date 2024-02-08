@@ -207,7 +207,8 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
         subprocess.run("pacstrap /mnt base base-devel linux linux-firmware btrfs-progs grub bash", shell=True)
         
         # Generate fstab
-        subprocess.run("genfstab -U /mnt >> /mnt/etc/fstab", shell=True)
+        subprocess.run("genfstab -U /mnt >> /mnt/etc/fstab", shell=True) ## i think something wrong in here
+        check_fstab()
         
         # Arch chroot
         subprocess.run("arch-chroot /mnt", shell=True)
@@ -231,12 +232,13 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
             print(f"{co.g}[*] Install Grub Finished{co.re}")
         else:
             print(f"{co.r}[-] Grub installation failed. Please check for errors.{co.re}")
+            print(f"{co.r}[!] error: {install_grub.stderr}{co.re}")
         # Generate Grub config
         mkgrub = subprocess.run("grub-mkconfig -O /boot/grub/grub.cfg", shell=True, capture_output=True, text=True)
         if mkgrub.returncode == 0 and "Found linux image:" in mkgrub.stdout and "Found initrd image:" in mkgrub.stdout and "Found fallback initrd image(s) in /boot:" in mkgrub.stdout:
             print(f"{co.g}[*] Grub config was created successfully.{co.re}")
         else:
-            print(f"{co.r}[-] Grub config failed to install ...{co.re}")
+            print(f"{co.r}[!] error: {mkgrub.stderr}{co.re}")
         # Create non-root user
         set_user_pass(selected_username, selected_user_pass)
         
@@ -246,7 +248,23 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
         # Install desktop environment
         install_desktop_environment(selected_DE)
     else:
-        print("Please set a device using 'set /dev/(device_name)' before installing.")
+        print(f"{co.g}[!] Please set a device using 'set /dev/(device_name)' before installing.{co.re}")
+
+def check_fstab():
+    fstab_path = "/mnt/etc/fstab"
+    if os.path.exists(fstab_path):
+        if os.path.getsize(fstab_path) > 0:
+            with open(fstab_path, "r") as fstab_file:
+                fstab_content = fstab_file.read()
+                if "/home" in fstab_content:
+                    print(f"{co.g}[*] fstab successfully created{co.re}")
+                else:
+                    print(f"{co.g}[-] fstab is empty or error. plis check the code !{co.re}")
+        else:
+            print(f"{co.g}[!] fstab exists but empty !{co.re}")
+    else:
+        print(f"{co.g}[!] fstab doesnt exists check the code !.{co.re}")
+
 
 def write_to_hosts_file():
     lines = [
