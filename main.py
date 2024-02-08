@@ -214,7 +214,7 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
         install_packages(package_list)
         
         # Arch chroot
-        subprocess.run("arch-chroot /mnt", shell=True)
+        subprocess.run("arch-chroot /mnt", shell=True) # i think error start in here
         
         # Set time, language, keymap, hostname, hosts
         set_time(selected_time_region, selected_time_city)
