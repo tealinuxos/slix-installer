@@ -343,11 +343,11 @@ def set_user_pass(username, user_pass):
 
 def install_desktop_environment(desktop_env):
     if desktop_env.lower() == "gnome":
-        subprocess.run(["pacman", "-S", "--noconfirm", "gnome", "gnome-tweaks", "gdm", "xorg-server", "xorg-apps", "xorg-xinit", "xterm", "&&", "systemctl", "start", "gdm.service", "&&", "systemctl", "enable", "gdm.service", "-f"], check=True)
+        subprocess.run(["pacman", "-S", "--noconfirm", "gnome", "gnome-tweaks", "gdm", "xorg-server", "xorg-apps", "xorg-xinit", "xterm", "pipewire", "pipewire-pulse", "&&", "systemctl", "start", "gdm.service", "&&", "systemctl", "enable", "gdm.service", "-f", "&&" "systemctl", "--user", "--now", "enable", "pipewire", "pipewire-pulse"], check=True)
     elif desktop_env.lower() == "xfce":
-        subprocess.run(["pacman", "-S", "xfce4", "sddm", "xfce4-goodies", "xorg-server", "xorg-apps", "xorg-xinit", "xterm", "&&", "systemctl", "start", "sddm.service", "&&", "systemctl", "enable", "sddm.service", "-f"], check=True)
+        subprocess.run(["pacman", "-S", "xfce4", "sddm", "xfce4-goodies", "xorg-server", "xorg-apps", "xorg-xinit", "xterm", "pipewire", "pipewire-pulse", "&&", "systemctl", "start", "sddm.service", "&&", "systemctl", "enable", "sddm.service", "-f", "&&" "systemctl", "--user", "--now", "enable", "pipewire", "pipewire-pulse"], check=True)
     elif desktop_env.lower() == "kde":
-        subprocess.run(["pacman", "-S", "--no-confirm", "plasma", "kdm", "konsole", "dolphin", "ark", "kwrite kcalc", "spectacle", "krunner", "partitionmanager", "packagekit-qt5", "xorg-server", "xorg-apps", "xorg-xinit", "xterm",  "&&", "systemctl", "start", "kdm.service", "&&", "systemctl", "enable", "kdm.service", "-f"], check=True)
+        subprocess.run(["pacman", "-S", "--no-confirm", "plasma", "kdm", "konsole", "dolphin", "ark", "kwrite kcalc", "spectacle", "krunner", "partitionmanager", "packagekit-qt5", "xorg-server", "xorg-apps", "xorg-xinit", "xterm", "pipewire", "pipewire-pulse", "&&", "systemctl", "start", "kdm.service", "&&", "systemctl", "enable", "kdm.service", "-f", "&&" "systemctl", "--user", "--now", "enable", "pipewire", "pipewire-pulse"], check=True)
     else:
         print(f"Desktop environment '{desktop_env}' is not supported.")
 
