@@ -160,7 +160,7 @@ def set_language(locale):
 # and make all logic that will be execute in arch installation
 def install_arch(selected_device, selected_device_efi, selected_time_region, selected_time_city, selected_lang, selected_keymap, selected_hostname, selected_username, selected_user_pass, selected_root_pass, selected_DE):
     if selected_device and selected_device_efi:
-        print(f"{co.g}Installing Arch Linux with Btrfs on /dev/{selected_device}...{co.re}")
+        print(f"{co.g}Installing Tea Linux with Btrfs on /dev/{selected_device}...{co.re}")
         # Format and mount the selected device
         subprocess.run(["mkfs.btrfs", f"/dev/{selected_device}"])
         subprocess.run(["mount", f"/dev/{selected_device}", "/mnt"])
@@ -176,7 +176,7 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
         subprocess.run(["btrfs", "su", "li", "/mnt"])
         
         # umounting
-        subprocess.run(["cd", "/"])
+        #subprocess.run(["cd", "/"])
         subprocess.run(["umount", "/mnt"])
         
         # mounting subvolume
@@ -200,7 +200,7 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
 
         # make dir boot
         os.system("mkdir -p /mnt/boot/efi")
-        subprocess.run(["mount", f"/dev/{selected_device_efi}", "mnt/boot/efi"])
+        subprocess.run(["mount", f"/dev/{selected_device_efi}", "/mnt/boot/efi"])
 
         # Install Arch Linux base system
         subprocess.run(["pacstrap", "/mnt", "base", "base-devel", "linux", "linux-firmware", "btrfs-progs", "grub"])
