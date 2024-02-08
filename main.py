@@ -1,4 +1,4 @@
-import subprocess, os
+import subprocess, os, re
 
 """ to do list
     help menu: will update
@@ -157,7 +157,7 @@ def set_language(locale):
 # make btrfs the device that user input, and then mount it
 # make sure user input package and if not it will be determinate
 # and make all logic that will be execute in arch installation
-def install_arch(selected_device,selected_device_efi,selected_time_region,selected_time_city,selected_lang, selected_keymap,selected_hostname, selected_root_pass):
+def install_arch(selected_device,selected_device_efi,selected_time_region,selected_time_city,selected_lang, selected_keymap,selected_hostname, selected_username, selected_user_pass, selected_root_pass):
     if selected_device and selected_device_efi:
         print(f"{co.g}Installing Arch Linux with Btrfs on /dev/{selected_device}...{co.re}")
         # Format and mount the selected device
@@ -227,9 +227,24 @@ def install_arch(selected_device,selected_device_efi,selected_time_region,select
             set_root_pass(selected_root_pass)
         else:
             pass
-        # install grub
-        
-        
+        # Install Grub
+        install_grub = subprocess.run(["grub-install", "--target=x86_64-efi", "--efi-directory=/boot/efi"], capture_output=True, text=True)
+        # Check if installation finished without error
+        if install_grub.returncode == 0 and "Installation finished. No error reported." in install_grub.stdout:
+            print(f"{co.g}[*] Install Grub Finished{co.re}")
+        else:
+            print(f"{co.g}[-] Grub installation failed. Please check for errors.{co.re}")
+        # grub mkconfig
+        mkgrub = subprocess.run(["grub-mkconfig", "-O", "/boot/grub/grub.cfg"], capture_output=True, text=True)
+        if mkgrub == 0 and "Found linux image:" and "Found initrd image:" and "Found fallback initrd image(s) in /boot:" in mkgrub.stdout:
+            print(f"{co.g}[*] Grub config was created successfully.{co.re}")
+        else:
+            print(f"{co.g}[-] Grub config failed to install ...{co.re}")
+        # created non root user
+        set_user_pass(selected_username, selected_user_pass)
+        # update sudoers
+        update_sudoers()
+        # install DE
 
     else:
         print("Please set a device using 'set /dev/(device_name)' before installing.")
@@ -309,9 +324,63 @@ def set_hostname(hostname):
 
 ### set root pass ###
 def set_root_pass(pass_root):
-    subprocess.run(['passwd'], input=pass_root.encode(), text=True)
-    print("[*]  Root password has been set.\n")
+    result = subprocess.run(['passwd'], input=pass_root.encode(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, text=True)
+    if result.returncode == 0:
+        print("[*] Root password has been set.")
+    else:
+        print("[!] Error setting root password:", result.stderr)
     
+### set username & pass ###
+def set_user_pass(username, user_pass):
+    try:
+        subprocess.run(["useradd", "-m", "-g", "users", "-G", "audio,video,network,wheel,storage,rfkill", "-s", "/bin/bash", username], check=True)
+        subprocess.run(["passwd", username], input=user_pass.encode(), check=True)
+        print(f"[*] User '{username}' has been created with the provided password.")
+    except subprocess.CalledProcessError as e:
+        print(f"[!] Error creating user '{username}': {e}")
+
+def install_desktop_environment(desktop_env):
+    if desktop_env.lower() == "gnome":
+        subprocess.run(["pacman", "-S", "--noconfirm", "gnome", "gnome-tweaks", "gdm", "xorg-server", "xorg-apps", "xorg-xinit", "xterm", "&&", "systemctl", "start", "gdm.service", "&&", "systemctl", "enable", "gdm.service"], check=True)
+    elif desktop_env.lower() == "xfce":
+        subprocess.run(["pacman", "-S", "xfce4", "ssdm", "xfce4-goodies"], check=True)
+    elif desktop_env.lower() == "kde":
+        subprocess.run(["pacman", "-S", "plasma-desktop"], check=True)
+    elif desktop_env.lower() == "lxde":
+        subprocess.run(["pacman", "-S", "lxde"], check=True)
+    elif desktop_env.lower() == "lxqt":
+        subprocess.run(["pacman", "-S", "lxqt"], check=True)
+    else:
+        print(f"Desktop environment '{desktop_env}' is not supported.")
+
+def update_sudoers():
+    # read sudoers
+    try:
+        with open("/etc/sudoers", "r") as file:
+            sudoers_content = file.readlines()
+    except FileNotFoundError:
+        print(f"{co.r}[!] Error: sudoers file not found.{co.re}")
+        return
+
+    # regex wheel 
+    pattern = r"^# (%wheel\s+ALL=\(ALL:ALL\) ALL)$"
+    new_line = "%wheel ALL=(ALL:ALL) ALL"
+
+    updated_content = []
+    for line in sudoers_content:
+        if re.match(pattern, line.strip()):
+            updated_content.append(new_line + "\n")  # change the # %wheel ALL=(ALL:ALL) ALL
+        else:
+            updated_content.append(line)
+
+    # rewrite sudoers
+    try:
+        with open("/etc/sudoers", "w") as file:
+            file.writelines(updated_content)
+        print(f"{co.g}[*] sudoers file has been updated.{co.re}")
+    except PermissionError:
+        print(f"{co.r}[!] Error: Permission denied. Make sure you have the necessary permissions to modify the sudoers file.{co.re}")
+        
 
 ### 0.9 show help ###
 def help():
@@ -350,6 +419,8 @@ def teaprompt():
     selected_keymap = None
     selected_hostname = None
     selected_root_pass = None
+    selected_username = None
+    selected_user_pass = None
     os.system("clear")
     ban()
     print(f"{co.ye}Welcome to TeaLinux Installer. Type 'help' to see all command and type 'exit' to quit.{co.re}\n")
@@ -374,8 +445,8 @@ def teaprompt():
             selected_device = set_device_efi(user_input[9:], device_names)
         # if user type install
         elif user_input.lower() == 'install':
-            if selected_device and selected_device_efi and selected_time_city and selected_time_region and selected_lang and selected_keymap and selected_hostname:
-                install_arch(selected_device, package_list, selected_device_efi, selected_time_city, selected_time_region, selected_lang, selected_keymap,selected_hostname, selected_root_pass)
+            if selected_device and selected_device_efi and selected_time_city and selected_time_region and selected_lang and selected_keymap and selected_hostname and selected_username and selected_user_pass and package_list:
+                install_arch(selected_device, package_list, selected_device_efi, selected_time_city, selected_time_region, selected_lang, selected_keymap,selected_hostname, selected_root_pass,selected_user_pass,selected_username,package_list)
             else:
                 print(f"{co.r}[!] select partition first !{co.re}")
         # if user type list time zone
@@ -387,7 +458,20 @@ def teaprompt():
             if selected_root_pass:
                 print(f"{co.g}[*] Your root password has set{co.re}")
             else:
-                print(f"{co.r}[!] YOu didn't input anything{co.re}")
+                print(f"{co.r}[!] You didn't input anything{co.re}")
+        # set user & pass
+        elif user_input.lower() == 'set user':
+            selected_username= input("Tea Installer[username] > ")
+            if selected_username:
+                print(f"{co.g}[*] Your username is {selected_username}{co.re}")
+            else:
+                print(f"{co.r}[!] You didn't input anything{co.re}")
+            selected_user_pass= input("Tea Installer[username] > ")
+            if selected_user_pass:
+                print(f"{co.g}[*] Your password for user {selected_username} is set ..{co.re}")
+            else:
+                print(f"{co.r}[!] You didn't input anything{co.re}")
+            
         # if user type clear
         elif user_input.lower() == 'clear':
             os.system("clear")
