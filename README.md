@@ -10,7 +10,7 @@ task :
 - setup desktop environment: done
 - setup bootloader: done (for now using grub only)
 - setup root password: done
-- setup audio: on going
+- setup audio: next update
 - setup package: maybe done
 - network configuration: i think done
 - setup hostname: done
@@ -24,6 +24,6 @@ task :
 all u had to do just test the script cj
 
 last update
-8 feb 2024 09:30 am WIB
+8 feb 2024 11.16 am WIB
 
-last progress on function choose DE
+i think done, need testing
