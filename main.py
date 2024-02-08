@@ -162,6 +162,7 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
     if selected_device and selected_device_efi:
         print(f"{co.g}Installing Tea Linux with Btrfs on /dev/{selected_device}...{co.re}")
         # Format and mount the selected device
+        subprocess.run(["mkfs.fat", f"/dev/{selected_device_efi}"])
         subprocess.run(["mkfs.btrfs", f"/dev/{selected_device}"])
         subprocess.run(["mount", f"/dev/{selected_device}", "/mnt"])
 
@@ -203,7 +204,7 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
         subprocess.run(["mount", f"/dev/{selected_device_efi}", "/mnt/boot/efi"])
 
         # Install Arch Linux base system
-        subprocess.run(["pacstrap", "/mnt", "base", "base-devel", "linux", "linux-firmware", "btrfs-progs", "grub"])
+        subprocess.run(["pacstrap", "/mnt", "base", "base-devel", "linux", "linux-firmware", "btrfs-progs", "grub", "bash"])
         
         # genfstab
         subprocess.run(["genfstab", "-U", "/mnt", ">>", "/mnt/etc/fstab"])
