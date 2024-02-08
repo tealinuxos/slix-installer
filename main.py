@@ -447,10 +447,10 @@ def teaprompt():
             selected_device_efi = set_device_efi(user_input[8:], device_names) 
 
 
-        # if user type install
+        # if user type 
         elif user_input.lower() == 'install':
             if selected_device and selected_device_efi and selected_time_city and selected_time_region and selected_lang and selected_keymap and selected_hostname and selected_username and selected_user_pass and package_list:
-                install_arch(selected_device, package_list, selected_device_efi, selected_time_city, selected_time_region, selected_lang, selected_keymap,selected_hostname, selected_root_pass,selected_user_pass,selected_username,package_list, selected_DE)
+                install_arch(selected_device, selected_device_efi, selected_time_region, selected_time_city, selected_lang, selected_keymap, selected_hostname, selected_username, selected_user_pass, selected_root_pass, selected_DE)
             else:
                 print(f"{co.r}[!] select partition first !{co.re}")
         # if user type list time zone
