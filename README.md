@@ -1,5 +1,10 @@
 # brewix-installer
-# masih error hehee bagian function install
+
+list error:
+- line 213:
+code: 'subprocess.run("arch-chroot /mnt", shell=True)'
+error: 'chroot: failed to run command ‘/bin/bash’: No such file or directory'
+
 task :
 
 - help menu: will update
@@ -21,9 +26,3 @@ task :
 - clear command: done
 - help command: done
 
-all u had to do just test the script cj
-
-last update
-8 feb 2024 11.16 am WIB
-
-i think done, need testing
