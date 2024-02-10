@@ -1,8 +1,7 @@
 # brewix-installer
 
 list error:
-- line 217
-- check error.log for more
+- there is no more error, but just delete command systemctl start desktop enviroment.service in function install_desktop_enviroment(), i think it will run without error, just check the error log
 
 task :
 
