@@ -17,7 +17,7 @@ task :
 - setup package: maybe done
 - network configuration: i think done
 - setup hostname: done
-- install tea linix: ON PROGRESS
+- install tea linix: TESTED AND INSTALLED
 - show option: on going (i mean show all configuration that user was do)
 - show time zone: done
 - show time zone city: done
