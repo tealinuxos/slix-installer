@@ -1,26 +1,7 @@
 import subprocess, os, re
 
-""" to do list
-    help menu: will update
-    select language: done
-    select time: done
-    select keyboard layout: done
- *  setup user: on going
- *  setup desktop environment: on going (gnome, xfce. kde, if u can try add hyprland too)
- *  setup bootloader: on going (for now using grub only)
- *  setup root password: on going
- *  setup audio: on going
- *  setup package: on going
- *  network configuration: on going
- *  setup to connect wifi: on going
- *  setup hostname: on going
-**  install tea linix: on going
-**  show option: on going (i mean show all configuration that user was do)
-    show time zone: done
-    show time zone city: done
-    clear command: done
-    help command: done
-
+""" 
+code by x0r, this code is nasty anyway
 """
 
 ### class color ###
@@ -79,7 +60,7 @@ def set_device(selected_device, device_names):
         return selected_device
     else:
         print(f"{co.r}[!] Invalid device name. Please select a valid device.{co.re}")
-
+### 0.4 selected efi device, to install grub ###
 def set_device_efi(selected_device_efi, device_names):
     selected_device_efi = selected_device_efi.split('/')[-1]  # Extract the device name
     if selected_device_efi in device_names:
@@ -88,14 +69,14 @@ def set_device_efi(selected_device_efi, device_names):
     else:
         print(f"{co.r}[!] Invalid EFI device name. Please select a valid device.{co.re}")
 
-### 0.4 set time zone ###
+### 0.5 set time zone ###
 def set_time(region, city):
-    subprocess.run([f"arch-chroot /mnt ln -sf /usr/share/zoneinfo/{region}/{city} /etc/localtime"], shell=True) ## on development i command this line bcz i dont want make my machine get execute this command LOL
+    subprocess.run([f"arch-chroot /mnt ln -sf /usr/share/zoneinfo/{region}/{city} /etc/localtime"], shell=True)
     subprocess.run([f"arch-chroot /mnt hwclock --systohc"], shell=True)
-    print(f"[*] Timezone set to {region}/{city}")
+    print(f"{co.g}[*] Timezone set to {region}/{city}{co.re}")
     return  region, city
 
-### 0.5 show all time zone ###
+### 0.6 show all time zone ###
 def list_time_zones():
     print("[*] List of available time zones:\n")
     output = os.popen("ls -l /usr/share/zoneinfo/ | grep '^d' | awk '{print $NF}'").read()
@@ -113,13 +94,13 @@ def list_time_zones():
                 print(f"[*] {lines[index]:<{column_width}}", end="\t")
         print()
 
-### 0.6 show all city in time zone ###
+### 0.7 show all city in time zone ###
 def list_time_city(cityin):
     print(f"[*]  List of available city in {cityin}:\n")
     os.system(f"ls /usr/share/zoneinfo/{cityin}")
     return cityin
 
-### 0.7 set language ###
+### 0.8 set language ###
 def list_languages():
     command = "cat /etc/locale.gen | awk '{print $1}'"
     output = os.popen(command).read()
@@ -148,16 +129,14 @@ def set_language(locale):
         # Generate the locale
         subprocess.run([f"arch-chroot /mnt locale-gen"], shell=True)
         subprocess.run([f"arch-chroot /mnt echo LANG={locale} > /etc/locale.conf"], shell=True)
-        print(f"[*] Language set to {locale}")
+        print(f"{co.g}[*] Language set to {locale}{co.re}")
 
     except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
+        print(f"{co.r}Error: {e}{co.re}")
     
-### 0.7 install arch ###
+### 0.9 install arch ###
 # need imporve:
-# make btrfs the device that user input, and then mount it
-# make sure user input package and if not it will be determinate
-# and make all logic that will be execute in arch installation
+# change grub from arch to tea linux
 def install_arch(selected_device, selected_device_efi, selected_time_region, selected_time_city, selected_lang, selected_keymap, selected_hostname, selected_username, selected_user_pass, selected_root_pass, selected_DE, package_list):
     if selected_device and selected_device_efi:
         print(f"{co.g}Installing Tea Linux with Btrfs on /dev/{selected_device}...{co.re}")
@@ -205,23 +184,12 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
         subprocess.run(f"mount /dev/{selected_device_efi} /mnt/boot/efi", shell=True)
         
         # Install Arch Linux base system
-        subprocess.run("pacstrap /mnt base base-devel linux linux-firmware btrfs-progs grub bash", shell=True) ## gaada error cuma lupa nganu keyring doang
-        msg = input("============================= setelah pacstrap ==========================")
+        subprocess.run("pacstrap /mnt base base-devel linux linux-firmware btrfs-progs grub bash wget", shell=True) ## gaada error cuma lupa nganu keyring doang
         # Generate fstab
         subprocess.run("genfstab -U /mnt >> /mnt/etc/fstab", shell=True) ## done nothing error in here
-        msg = input("============================= setelah genfstab ==========================")
         check_fstab()
-        msg = input("============================= setelah check_fstab ==========================")
-        
         # install adational package
         install_packages(package_list)
-        msg = input("============================= setelah install aditional package ==========================")
-        
-        # Arch chroot
-        msg = input("============================= awal arch-chroot ==========================")
-        #subprocess.run("arch-chroot /mnt", shell=True) # i think error start in here
-        msg = input("============================= setelah arch-chroot ==========================")
-        
         # Set time, language, keymap, hostname, hosts
         set_time(selected_time_region, selected_time_city)
         set_language(selected_lang)
@@ -230,43 +198,25 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
         write_to_hosts_file()
         
         # Install network manager
-        msg = input("============================= sebelum pacman network manager grub sm efi terus nyalain network manager ==========================")
         os.system("arch-chroot /mnt pacman -S --noconfirm networkmanager grub efibootmgr")
         enable_networkmanager()
-        msg = input("============================= habis sebelum network manager ==========================")
-
         # Change root password
-        msg = input("============================= set root pass ==========================")
         if selected_root_pass:
             set_root_pass(selected_root_pass)
         else:
             print(f"{co.ye}[!] You not setting root pass ..{co.re}")
-        msg = input("============================= setelah root pass ==========================")
-
         # Install Grub
-        msg = input("============================= sebelum install grub ==========================")
         installing_grub()
-        msg = input("============================= setelah install grub ==========================")
-
         # Generate Grub config
-        msg = input("============================= sebelum set grubmkconfig ==========================")
         mk_grubb()
-        msg = input("============================= sesudah set grubmkconfig ==========================")
-        
-        msg = input("============================= sebelum set user non root ==========================")
+        # update os-release
+        update_os_release()
         # Create non-root user
         set_user_pass(selected_username, selected_user_pass)
-        msg = input("============================= sesudah set user non root ==========================")
-        msg = input("============================= sebelum set sudoers file ==========================")
         # Update sudoers
         update_sudoers()
-        msg = input("============================= setelah set sudoers file ==========================")
-        
-        
-        msg = input("============================= sebelum install de ==========================")
         # Install desktop environment
         install_desktop_environment(selected_DE)
-        msg = input("============================= setelah install de ==========================")
         
         # finish
         print(f"{co.g}[+] Tea Linux was installed ..{co.re}")
@@ -281,8 +231,29 @@ def install_arch(selected_device, selected_device_efi, selected_time_region, sel
             os.system("arch-chroot /mnt")
         
     else:
-        print(f"{co.g}[!] Please set a device using 'set /dev/(device_name)' before installing.{co.re}")
+        print(f"{co.r}[!] Please set a device using 'set /dev/(device_name)' before installing.{co.re}")
+### update os-release       
+def update_os_release():
+    new_content = '''NAME="Tea Linux"
+PRETTY_NAME="Tea Linux"
+ID=arch
+BUILD_ID=rolling
+ANSI_COLOR="38;2;23;147;209"
+HOME_URL="https://tealinuxos.org/"
+DOCUMENTATION_URL="https://tealinuxos.org/dokumentasi/"
+LOGO=archlinux-logo'''
 
+    try:
+        with open("/mnt/etc/os-release", "w") as file:
+            file.write(new_content)
+        print(f"{co.g}[*] Updated /etc/os-release successfully.{co.re}")
+        os.system("arch-chroot /mnt wget -q https://raw.githubusercontent.com/tealinuxos/brewix-installer/main/neofetch -O /usr/bin/neofetch")
+        os.system("arch-chroot /mnt chmod +x /usr/bin/neofetch")
+    except Exception as e:
+        print(f"{co.r}[!] Error updating /etc/os-release: {e}{co.re}")
+
+### 1. installing grub ###
+## need to add some code to change arch to tea linux
 def installing_grub():
     try:
         install_grub = subprocess.run("arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi", shell=True, capture_output=True, text=True)
@@ -290,20 +261,30 @@ def installing_grub():
             print(f"{co.g}[*] Grub successfully installed.{co.re}")
         else:
             print(f"{co.r}[-] Failed installing grub.{co.re}")
+            print(f"{co.r}[-] Error message:\n{install_grub.stderr}{co.re}")
     except Exception as e:
-        print(f"Error: {e}")
-
+        print(f"{co.r}Error: {e}{co.re}")
+        
+### 1.1 mkgrub config ###
 def mk_grubb():
     try:
         mkgrub = subprocess.run("arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg", shell=True, capture_output=True, text=True)
         if "Found linux image: /boot/vmlinuz-linux" in mkgrub.stderr:
             print(f"{co.g}[*] Grub config was created successfully.{co.re}")
+            try:
+                with open("/mnt/boot/grub/grub.cfg", 'r') as file:
+                    file_content = file.read()
+                new_os = file_content.replace("Arch Linux", "Tea Linux")
+                with open("/mnt/boot/grub/grub.cfg", 'w') as file:
+                    file.write(new_os)
+            except Exception as e:
+                print(f"{co.r}[!] Error when try change os-release, Error: {e}.{co.re}")
         else:
-            print(f"{co.r}[!] Fail while install grub-mkconfig{co.re}")
+            print(f"{co.r}[!] Fail while run grub-mkconfig{co.re}")
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"{co.r}Error: {e}{co.re}")
         
-
+### check fstab, on development i use this to check if fstab exists or no, usualy no but now its fix ###
 def check_fstab():
     fstab_path = "/mnt/etc/fstab"
     if os.path.exists(fstab_path):
@@ -313,12 +294,13 @@ def check_fstab():
                 if "/home" in fstab_content:
                     print(f"{co.g}[*] fstab successfully created{co.re}")
                 else:
-                    print(f"{co.g}[-] fstab is empty or error. plis check the code !{co.re}")
+                    print(f"{co.ye}[-] fstab is empty or error. plis check the code !{co.re}")
         else:
-            print(f"{co.g}[!] fstab exists but empty !{co.re}")
+            print(f"{co.ye}[!] fstab exists but empty !{co.re}")
     else:
-        print(f"{co.g}[!] fstab doesnt exists check the code !.{co.re}")
+        print(f"{co.r}[!] fstab doesnt exists check the code !.{co.re}")
 
+### 1.2 installing network manager and enable the network manager service ###
 def enable_networkmanager():
     os.system("arch-chroot /mnt systemctl start NetworkManager && arch-chroot /mnt systemctl enable NetworkManager")
     check = subprocess.run(["arch-chroot /mnt ls -la /etc/systemd/system/multi-user.target.wants/NetworkManager.service"], shell=True, capture_output=True, text=True) 
@@ -327,27 +309,26 @@ def enable_networkmanager():
     else:
         print(f"{co.r}[-] NetworkManager doesnt enabled properly. {co.re}")
 
+### 1.3 add etc/hosts ###
 def write_to_hosts_file():
     lines = [
-        "# Static table lookup for hostnames.",
-        "# See hosts(5) for details.",
         "127.0.0.1                 localhost",
         "::1                       localhost",
         "127.0.0.1                 tealinux.localdomain"
     ]
 
-    # Menyiapkan konten yang akan ditambahkan ke file /etc/hosts
+    # save the content that will be save in /etc/hosts
     hosts_content = '\n'.join(lines)
 
     try:
-        # Membuka file /etc/hosts dan menambahkan konten yang disiapkan
+        # open /etc/hosts and add the content
         with open("/mnt/etc/hosts", "a") as hosts_file:
             hosts_file.write(hosts_content + "\n")
         print(f"{co.g}[*] Content has been added to /etc/hosts.{co.re}")
     except Exception as e:
         print(f"{co.r}[!] Error adding content to /etc/hosts: {e}{co.re}")
 
-### install aditional package ###
+### 1.4 install aditional package from user that input it###
 def install_packages(package_list):
     if package_list:
         print(f"{co.g}[*] Installing additional packages: {', '.join(package_list)}{co.re}")
@@ -358,7 +339,7 @@ def install_packages(package_list):
     else:
         print(f"{co.ye}[*] No additional packages specified.{co.re}")
 
-### 0.8 show all keymaps ###
+### 1.5 show all keymaps ###
 def list_keymaps():
     command = "ls /usr/share/kbd/keymaps/**/*.map.gz && ls /usr/share/kbd/keymaps/**/**/*.map.gz"
     try:
@@ -370,7 +351,7 @@ def list_keymaps():
         print(f"Error: {e}")
         return None
     
-### 0.8.1 make the output keymaps more better ###
+### 1.5.1 make the output keymaps more better ###
 def print_keymaps(keymap_list):
     if keymap_list:
         print("[*] List of available keymaps:\n")
@@ -387,19 +368,20 @@ def print_keymaps(keymap_list):
                 if index < len(lines):
                     print(f"[*] {lines[index]:<{column_width}}", end="\t")
             print()  # Move to the next line after printing each row
-      
-            
+
+### 1.6 set keyboard layout ###            
 def set_keymap(keymap):
     keymap_list = list_keymaps()
     if keymap in keymap_list:
         try:
             subprocess.run([f"arch-chroot /mnt echo KEYMAP={keymap} > /etc/vconsole.conf"], shell=True)
-            print(f"[*] Keymap set to {keymap}")
+            print(f"{co.g}[*] Keymap set to {keymap}{co.re}")
         except subprocess.CalledProcessError as e:
-            print(f"Error: {e}")
+            print(f"{co.r}Error: {e}{co.re}")
     else:
-        print("[!] Invalid keymap code. Please select a valid keymap.")
+        print(f"{co.ye}[!] Invalid keymap code. Please select a valid keymap.{co.re}")
 
+### 1.7 setting hostname ###
 def set_hostname(hostname):
     try:
         with open("/mnt/etc/hostname", "w") as hostnames:
@@ -412,9 +394,9 @@ def set_hostname(hostname):
             else:
                 print(f"{co.r}[-] Setting hostname error.{co.re}")
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"{co.g}Error: {e}{co.re}")
 
-### set root pass ###
+### 1.8 set root pass if user input it ###
 def set_root_pass(pass_root):
     passwd_input = f"{pass_root}\n{pass_root}\n"
     result = subprocess.run(['arch-chroot', '/mnt', 'passwd'], input=passwd_input.encode(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -423,7 +405,7 @@ def set_root_pass(pass_root):
     else:
         print(f"{co.r}[!] Error setting root password: {result.stderr}{co.re}")
     
-### set username & pass ###
+### 1.9 set username & pass ###
 def set_user_pass(username, user_pass):
     try:
         create_user = subprocess.run(f"arch-chroot /mnt useradd -m -g users -G audio,video,network,wheel,storage,rfkill -s /bin/bash {username}", shell=True, capture_output=True, check=True)
@@ -436,18 +418,21 @@ def set_user_pass(username, user_pass):
         if "New password: Retype new password: passwd: password updated successfully" in create_pass.stdout:
             print(f"{co.g}[*] User '{username}' has been created with the provided password.{co.re}")
     except subprocess.CalledProcessError as e:
-        print(f"[!] Error creating user '{username}': {e}")
+        print(f"{co.r}[!] Error creating user '{username}': {e}{co.re}")
 
+### 2. installing desktop environment that user select ###
+## need upgrade to add more desktop environment options ##
 def install_desktop_environment(desktop_env):
     if desktop_env.lower() == "gnome":
-        subprocess.run(["arch-chroot /mnt pacman -S --noconfirm gnome gnome-tweaks gdm xorg-server xorg-apps xorg-xinit xterm pipewire pipewire-pulse && systemctl start gdm.service && systemctl enable gdm.service -f && systemctl --user --now enable pipewire pipewire-pulse"], shell=True, check=True) ## error in systemctl start gdm idk in arch chroot got error maybe to the another desktop enviroment is the same one, try to remove systemctl enable gdm start first and run again in pain, bro my internet is really slow that why this take so long
+        subprocess.run(["arch-chroot /mnt pacman -S --noconfirm gnome gnome-tweaks gdm xorg-server xorg-apps xorg-xinit xterm pipewire pipewire-pulse && systemctl enable gdm -f"], shell=True, check=True) ## error in systemctl start gdm idk in arch chroot got error maybe to the another desktop enviroment is the same one, try to remove systemctl enable gdm start first and run again in pain, bro my internet is really slow that why this take so long
     elif desktop_env.lower() == "xfce":
-        subprocess.run(["arch-chroot /mnt pacman -S --noconfirm xfce4 sddm xfce4-goodies xorg-server xorg-apps xorg-xinit xterm pipewire pipewire-pulse && systemctl start sddm.service && systemctl enable sddm.service -f && systemctl --user --now enable pipewire pipewire-pulse"], shell=True, check=True)
+        subprocess.run(["arch-chroot /mnt pacman -S --noconfirm xfce4 sddm xfce4-goodies xorg-server xorg-apps xorg-xinit xterm pipewire pipewire-pulse && systemctl enable sddm -f"], shell=True, check=True)
     elif desktop_env.lower() == "kde":
-        subprocess.run(["arch-chroot /mnt pacman -S --no-confirm plasma kdm konsole dolphin ark kwrite kcalc spectacle krunner partitionmanager packagekit-qt5 xorg-server xorg-apps xorg-xinit xterm pipewire pipewire-pulse && systemctl start kdm.service && systemctl enable kdm.service -f && systemctl --user --now enable pipewire pipewire-pulse"], check=True)
+        subprocess.run(["arch-chroot /mnt pacman -S --no-confirm plasma kdm konsole dolphin ark kwrite kcalc spectacle krunner partitionmanager packagekit-qt5 xorg-server xorg-apps xorg-xinit xterm pipewire pipewire-pulse && systemctl enable kdm -f"], check=True)
     else:
-        print(f"Desktop environment '{desktop_env}' is not supported for now.")
+        print(f"{co.ye}Desktop environment '{desktop_env}' is not supported for now.{co.re}")
 
+### 2.1 update file /etc/sudoers to change # wheel....
 def update_sudoers():
     # read sudoers
     try:
@@ -478,12 +463,12 @@ def update_sudoers():
     except PermissionError:
         print(f"{co.r}[!] Error: Permission denied. Make sure you have the necessary permissions to modify the sudoers file.{co.re}")
 
-### 0.9 show help ###
+### 2.2 show help ###
 def help():
     os.system("clear")
     ban()
-    print("""
-    Tea Linux Installer Beta Version
+    print(f"""
+    {co.ye}{co.bo}Tea Linux Installer Beta Version{co.re}
     
     options:
     help\t\t\tShow all command
@@ -506,7 +491,7 @@ def help():
     exit\t\t\tExit installer   
     """)
 
-### 1. main function i think, bcz this the prompt###
+### 2.3 main function i think, bcz this the prompt###
 def teaprompt():
     selected_device = None
     selected_device_efi = None
@@ -609,9 +594,9 @@ def teaprompt():
                 if keymap in keymap_list:
                     print(f"{co.g}[*] Keymap set to {selected_keymap}{co.re}")
                 else:
-                    print("[!] Invalid keymap code. Please select a valid keymap.")
+                    print(f"{co.y}[!] Invalid keymap code. Please select a valid keymap.{co.re}")
             else:
-                print("[!] Invalid 'set keymap' command format. Please use 'set keymap keymap_code'.")
+                print(f"[!] Invalid {co.r}'set keymap'{co.re} command format. Please use {co.g}'set keymap keymap_code'{co.re}.")
             
             # if user input package that will be installed
         elif user_input.lower().startswith('set package'):
@@ -619,9 +604,9 @@ def teaprompt():
             if len(tokens) == 3:
                 _, _, packages = tokens
                 package_list = packages.split()
-                print(f"[*] Package that will be install : {', '.join(package_list)}")
+                print(f"{co.g}[*] Package that will be install : {', '.join(package_list)}{co.re}")
             else:
-                print("[!] Invalid 'set package' command format. Please use 'set package Package1 Package2 ...'.")
+                print(f"[!] Invalid {co.r}'set package'{co.re} command format. Please use {co.g}'set package Package1 Package2 ...'{co.re}.")
 
         # if user type set time Region City
         elif user_input.lower().startswith('set time'):
@@ -632,7 +617,7 @@ def teaprompt():
                 selected_time_city = city
                 print(f"{co.g}[*] Time set to {region}/{city} ..{co.re}")
             else:
-                print("[!] Invalid 'set time' command format. Please use 'set time Region City'.")
+                print(f"[!] Invalid {co.r}'set time'{co.re} command format. Please use {co.g}'set time Region City'{co.re}.")
                 
         # if user type set language
         elif user_input.lower().startswith('set language'):
@@ -662,24 +647,24 @@ def teaprompt():
                 selected_hostname = hostname
                 print(f"{co.g}[*] Hostname set to {selected_hostname}{co.re}")
             else:
-                print("[!] Invalid 'set hostname' command format. Please use 'set hostname YourHostName'.")
+                print(f"[!] Invalid {co.r}'set hostname'{co.re} command format. Please use {co.g}'set hostname YourHostName'{co.re}.")
         
         elif user_input.lower().startswith('show options'):
-            print(f"{co.g}[*] partition for Tea install:\t{selected_device}")
-            print(f"[*] partition for EFI:\t\t{selected_device_efi}")
-            print(f"[*] region time:\t\t{selected_time_region}")
-            print(f"[*] city time:\t\t\t{selected_time_city}")
-            print(f"[*] language:\t\t\t{selected_lang}")
-            print(f"[*] keymaps:\t\t\t{selected_keymap}")
-            print(f"[*] root password:\t\t{selected_root_pass}")
-            print(f"[*] username:\t\t\t{selected_username}")
-            print(f"[*] password for {selected_username}:\t\t{selected_user_pass}")
-            print(f"[*] hostname:\t\t\t{selected_hostname}")
-            print(f"[*] aditional packages:\t\t{package_list}")
-            print(f"[*] Desktop Enviroment:\t\t{selected_DE}")
+            print(f"{co.g}[*] partition for Tea install:\t{co.re}{co.ye}{selected_device}{co.re}")
+            print(f"{co.g}[*] partition for EFI:\t\t{co.re}{co.ye}{selected_device_efi}{co.re}")
+            print(f"{co.g}[*] region time:\t\t{co.re}{co.ye}{selected_time_region}{co.re}")
+            print(f"{co.g}[*] city time:\t\t\t{co.re}{co.ye}{selected_time_city}{co.re}")
+            print(f"{co.g}[*] language:\t\t\t{co.re}{co.ye}{selected_lang}{co.re}")
+            print(f"{co.g}[*] keymaps:\t\t\t{co.re}{co.ye}{selected_keymap}{co.re}")
+            print(f"{co.g}[*] root password:\t\t{co.re}{co.ye}{selected_root_pass}{co.re}")
+            print(f"{co.g}[*] username:\t\t\t{co.re}{co.ye}{selected_username}{co.re}")
+            print(f"{co.g}[*] password for {selected_username}:\t\t{co.re}{co.ye}{selected_user_pass}{co.re}")
+            print(f"{co.g}[*] hostname:\t\t\t{co.re}{co.ye}{selected_hostname}{co.re}")
+            print(f"{co.g}[*] aditional packages:\t\t{co.re}{co.ye}{package_list}{co.re}")
+            print(f"{co.g}[*] Desktop Enviroment:\t\t{co.re}{co.ye}{selected_DE}{co.re}")
             print(f"{co.re}{co.ye}[*] All settings are saved in the config file.{co.re}")
         else:
-            print("[!] Command not found ..")
+            print(f"{co.ye}[!] Command not found ..{co.re}")
     
 if __name__ == "__main__":
     teaprompt()
