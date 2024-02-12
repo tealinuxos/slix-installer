@@ -1,7 +1,7 @@
 # brewix-installer
 
 list error:
-- so far no error
+- so far no error,plis add issue if u found any error, thx
 
 task :
 
