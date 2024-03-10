@@ -34,6 +34,6 @@ task :
 - help command: done
 
 # last testing:
-![fakme](https://raw.githubusercontent.com/tealinuxos/brewix-installer/main/swappy-20240211-162101.png)
+![fakme](https://raw.githubusercontent.com/tealinuxos/brewix-installer/main/image/swappy-20240211-162101.png)
 
-![fakme](https://raw.githubusercontent.com/tealinuxos/brewix-installer/main/swappy-20240211-162143.png)
+![fakme](https://raw.githubusercontent.com/tealinuxos/brewix-installer/main/image/swappy-20240211-162143.png)
