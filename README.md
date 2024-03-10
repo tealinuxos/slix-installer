@@ -1,11 +1,10 @@
 # brewix-installer
 
 last update:
-- add package_installer: package installer using textualize, just for learning about textualize
+- add tui/package_installer.py: package installer using textualize, just for learning about textualize
 
-list error:
-- so far no error,plis add issue if u found any error, thx
-- i have a bad feeling if user input a root password, i think will error, but so far im not tested that function, maybe i will try to check and create logic if user input root password, is opsional to create user non root
+last error:
+- cant install grub: fix i think
 
 
 to do list:
@@ -20,13 +19,13 @@ task :
 - select keyboard layout: done
 - setup user: done
 - setup desktop environment: done
-- setup bootloader: done (for now using grub only)
+- setup bootloader: done 
 - setup root password: done
 - setup audio: done
 - setup package: done
-- network configuration: i think done
+- network configuration: done
 - setup hostname: done
-- install tea linux: TESTED, INSTALLED, NO ERROR
+- install tea linux: done
 - show option: done
 - show time zone: done
 - show time zone city: done
