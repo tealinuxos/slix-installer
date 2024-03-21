@@ -41,12 +41,15 @@ def teaprompt():
         if user_input.lower() == 'exit':
             print(f"{co.r}[!] Exiting Tea Linux Installer...{co.re}")
             break
+        
         # if user type help
         elif user_input.lower() == 'help':
             help()
+            
         # if user type partition
         elif user_input.lower() == 'partition':
             device_names = part()
+            
         # if user type set /dev/(device name)
         elif user_input.lower().startswith('set /dev/'):
             selected_device = set_device(user_input[9:], device_names)
@@ -54,16 +57,17 @@ def teaprompt():
         elif user_input.lower().startswith('set efi /dev/'):
             selected_device_efi = set_device_efi(user_input[8:], device_names) 
 
-
         # if user type install
         elif user_input.lower() == 'install':
             if selected_device and selected_device_efi and selected_time_city and selected_time_region and selected_lang and selected_keymap and selected_hostname and selected_username and selected_user_pass and package_list:
                 install_tea(selected_device, selected_device_efi, selected_time_region, selected_time_city, selected_lang, selected_keymap, selected_hostname, selected_username, selected_user_pass, selected_root_pass, selected_DE, package_list)
             else:
                 print(f"{co.r}[!] select partition first !{co.re}")
+                
         # if user type list time zone
         elif user_input.lower() == 'list time zone':
             list_time_zones()
+            
         # set root pass
         elif user_input.lower() == 'set root pass':
             selected_root_pass = input("Tea Installer[root pass] > ")
@@ -71,6 +75,7 @@ def teaprompt():
                 print(f"{co.g}[*] Your root password has set{co.re}")
             else:
                 print(f"{co.r}[!] You didn't input anything{co.re}")
+                
         # set user & pass
         elif user_input.lower() == 'set user':
             selected_username= input("Tea Installer[username] > ")
@@ -88,10 +93,12 @@ def teaprompt():
         elif user_input.lower() == 'clear':
             os.system("clear")
             ban()
+            
         # if user type list keymaps
         elif user_input.lower() == 'list keymaps':
             keymap_list = list_keymaps()
             print_keymaps(keymap_list)
+            
         # if user type set de, for select deesktop env, and this is opsional, user can setup and no
         elif user_input.lower().startswith("set de"):
             tokens = user_input.split(' ', 2)
@@ -164,6 +171,7 @@ def teaprompt():
                 list_time_city(cityin)
             else:
                 print(f"[!]  Invalid {co.r}'list city'{co.re} command format. Please use {co.g}'list city Regions'{co.re}.")
+                
         # if user set hostname        
         elif user_input.lower().startswith('set hostname'):
             tokens = user_input.split(' ', 3)
