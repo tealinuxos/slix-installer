@@ -7,6 +7,7 @@ from core.list_time_zone import list_time_zones # show the time zone
 from core.list_city import list_time_city # show the city zone
 from core.list_language import list_languages # show the language
 from core.install import install_tea # lib for install tea linux
+from core.install_local import install_tea_local # lib for install tea linux
 from core.list_keymap import list_keymaps  # for show all keymaps
 from core.print_keymap import print_keymaps # print all keymap from list_keymaps
 from core.help_menu import help # to show help banner
@@ -64,6 +65,13 @@ def teaprompt():
             else:
                 print(f"{co.r}[!] select partition first !{co.re}")
                 
+        # if user type install
+        elif user_input.lower() == 'install-local':
+            if selected_device and selected_device_efi and selected_time_city and selected_time_region and selected_lang and selected_keymap and selected_hostname and selected_username and selected_user_pass and package_list:
+                install_tea_local(selected_device, selected_device_efi, selected_time_region, selected_time_city, selected_lang, selected_keymap, selected_hostname, selected_username, selected_user_pass, selected_root_pass, selected_DE, package_list)
+            else:
+                print(f"{co.r}[!] select partition first !{co.re}")
+
         # if user type list time zone
         elif user_input.lower() == 'list time zone':
             list_time_zones()
@@ -171,7 +179,7 @@ def teaprompt():
                 list_time_city(cityin)
             else:
                 print(f"[!]  Invalid {co.r}'list city'{co.re} command format. Please use {co.g}'list city Regions'{co.re}.")
-                
+
         # if user set hostname        
         elif user_input.lower().startswith('set hostname'):
             tokens = user_input.split(' ', 3)
