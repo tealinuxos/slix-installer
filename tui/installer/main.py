@@ -47,7 +47,7 @@ class Tea(App[None]):
         Binding("q","tombol_metu", "Quit", priority=True)
     ]
 
-    CSS_PATH = "pake.tcss"
+    CSS_PATH = "tcss/installer.tcss"
 
     def compose(self) -> ComposeResult:
         with VerticalScroll(classes="scrollsu",id="sidebar"):
