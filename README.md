@@ -1,10 +1,11 @@
 # brewix-installer
 
 last update:
-- add tui/package_installer.py: package installer using textualize, just for learning about textualize
+- make the contents of the tui folder tidier
+- upload file installer tui
 
 last error:
-- cant install grub: fix i think
+- [x] cant install grub
 
 
 to do list:
@@ -13,24 +14,24 @@ to do list:
 
 task :
 
-- help menu: done
-- select language: done
-- select time: done
-- select keyboard layout: done
-- setup user: done
-- setup desktop environment: done
-- setup bootloader: done 
-- setup root password: done
-- setup audio: done
-- setup package: done
-- network configuration: done
-- setup hostname: done
-- install tea linux: done
-- show option: done
-- show time zone: done
-- show time zone city: done
-- clear command: done
-- help command: done
+- [x] help menu
+- [x] select language
+- [x] select time
+- [x] select keyboard layout
+- [x] setup user
+- [x] setup desktop environment
+- [x] setup bootloader 
+- [x] setup root password
+- [x] setup audio
+- [x] setup package
+- [x] network configuration
+- [x] setup hostname
+- [x] install tea linux
+- [x] show option
+- [x] show time zone
+- [x] show time zone city
+- [x] clear command
+- [x] help command
 
 # last testing:
 ![fakme](https://raw.githubusercontent.com/tealinuxos/brewix-installer/main/image/swappy-20240211-162101.png)
