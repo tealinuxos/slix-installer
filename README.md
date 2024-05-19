@@ -1,4 +1,4 @@
-# brewix-installer
+# slix-installer
 
 last update:
 - make the contents of the tui folder tidier
