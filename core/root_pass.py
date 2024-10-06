@@ -4,7 +4,7 @@ import subprocess
 ### 1.8 set root pass if user input it ###
 def set_root_pass(pass_root):
     try:
-        result = subprocess.run(f'echo -e "{pass_root}\n{pass_root}" | passwd root', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        result = subprocess.run(f'arch-chroot /mnt echo -e "{pass_root}\n{pass_root}" | passwd root', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if result.returncode == 0:
             print(f"{co.bo}{co.g}[*] Root password has been set.{co.re}")
         else:
